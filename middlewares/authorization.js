@@ -19,6 +19,7 @@ exports.verifyToken = (req, res, next) => {
   try {
     p.then((decoded) => {
       req.decoded = decoded
+      res.locals._id = decoded._id;
       next()
     })
   } catch (err) {

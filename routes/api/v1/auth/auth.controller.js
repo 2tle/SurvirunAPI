@@ -111,6 +111,63 @@ exports.getUserByUsername = (req,res) => {
   }
 }
 
+
+
+
+
+
+/* 
+[GET] /api/v1/auth/by-email/:email
+{
+  user: {
+    _id: "",
+    email: "",
+    username: ""
+  }
+}
+유저가 존재하면 200코드 및 유저데이터 반환,
+존재하지 않으면 404코드 null 반환
+*/
+
+exports.getUserByEmail= (req,res) => {
+  const email = req.params.email
+  console.log(`/api/v1/auth/by-email/`+email+` called`)
+  if(!email) return res.status(400).json({error: "email must not be null"})
+
+  const getUser = (email) => {
+    return User.find({email: email}).exec()
+  }
+
+  const check = (user) => {
+    if(!user.length) return res.status(404).json({user: null})
+    else return user
+  }
+
+  const dataProcess = (user) => {
+    const userJson = {
+      "_id": user[0]._id,
+      "email": user[0].email,
+      "username": user[0].username
+    }
+
+    return res.status(200).json(userJson)
+  }
+
+  try {
+    getUser(email).then(check).then(dataProcess)
+  } catch(err) {
+    console.error(err.message)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+}
+
+
+
+
+
+
+
+
 /* 
 [POST] /api/v1/auth/new
 {
@@ -136,7 +193,7 @@ exports.createNewUser = (req,res) => {
       email: user.email,
       username: user.username
     }, config.secret, {
-      expiresIn: '24h',
+      expiresIn: '12h',
       subject: "userinfo",
       issuer: config.hostname
     })
@@ -171,7 +228,7 @@ exports.createToken = (req,res) => {
       email: user.email,
       username: user.username
     }, config.secret, {
-      expiresIn: '1m',
+      expiresIn: '12h',
       subject: "userinfo",
       issuer: config.hostname
     })
