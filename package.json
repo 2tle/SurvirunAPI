@@ -12,9 +12,12 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "config.js": "^0.1.0",
+    "crypto": "^1.0.1",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.14",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "url": "^0.11.0"
   }
 }

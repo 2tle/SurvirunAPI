@@ -2,6 +2,7 @@ const app = require('express')()
 const config = require('./config.js')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
+const url = require('url')
 
 mongoose.Promise = global.Promise
 mongoose.set('useNewUrlParser', true)
@@ -27,7 +28,7 @@ app.use((req,res,next) => {
 app.set('jwt-secret', config.secret)
 
 app.get('/', (req,res) => {
-  res.status(200).json({status: 200})
+  res.status(200).json({status: 200, baseUrl:req.hostname})
 })
 
 app.use('/api', require('./routes/api'))
