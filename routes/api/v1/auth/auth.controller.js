@@ -228,7 +228,7 @@ exports.createToken = (req,res) => {
       email: user.email,
       username: user.username
     }, config.secret, {
-      expiresIn: '12h',
+      expiresIn: '1m',
       subject: "userinfo",
       issuer: config.hostname
     })

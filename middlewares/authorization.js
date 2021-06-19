@@ -3,14 +3,21 @@ const config = require('../config.js')
 
 exports.verifyToken = (req, res, next) => {
 
-  const token = req.headers['x-access-token'] || req.query.token
+  const token = req.headers['x-access-token']
   if(!token) {
     return res.status(401).json({error: "Not logged in"})
   }
   const p = new Promise(
     (resolved, reject) => {
       jwt.verify(token, config.secret, (err, decoded) => {
-      if(err) return res.status(401).json({error: "Token expired"})
+      if(err) {
+        if(err.name === 'TokenExpiredError') {
+          return res.status(419).json({error: "Token expired"})
+        } else {
+          return res.status(401).json({error: "Invaild token"})
+        }
+        
+      }
         resolved(decoded)
       })
     }

@@ -64,3 +64,47 @@ exports.createPost = (req,res) => {
     return res.status(500).json({error: "Internal Server Error"})
   }
 }
+
+exports.addLikes = (req,res) => {
+  const getPost = () => {
+    return Posts.findOne({_id: req.params.id}).exec()
+  }
+  const updatePost = (post) => {
+    console.log(res.locals._id)
+    console.log(post.likes)
+    var arr = post.likes;
+    arr.push(res.locals._id)
+    return Posts.updateOne({_id: req.params.id}, { $set: { likes:arr} }).exec()
+  }
+  const returnResult = (post) => {
+    return res.status(200).json({result: true})
+  }
+  try {
+    getPost().then(updatePost).then(returnResult)
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+}
+
+exports.minusLikes = (req,res) => {
+  const getPost = () => {
+    return Posts.findOne({_id: req.params.id}).exec()
+  }
+  const updatePost = (post) => {
+    console.log(res.locals._id)
+    console.log(post.likes)
+    var arr = post.likes;
+    arr.push(res.locals._id)
+    return Posts.updateOne({_id: req.params.id}, { $set: { likes:arr} }).exec()
+  }
+  const returnResult = (post) => {
+    return res.status(200).json({result: true})
+  }
+  try {
+    getPost().then(updatePost).then(returnResult)
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+}
