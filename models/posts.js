@@ -15,9 +15,11 @@ const Posts = new Schema({
   created: {
     type: String,
   },
-  likes: [String],
-  comments: [String],
-  options: [String],
+  likes: [],
+  comments: [[]],
+  options: {
+
+  },
 })
 
 module.exports = mongoose.model("posts",Posts)

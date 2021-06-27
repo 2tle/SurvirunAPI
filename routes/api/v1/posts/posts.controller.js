@@ -108,3 +108,11 @@ exports.minusLikes = (req,res) => {
     return res.status(500).json({error: "Internal Server Error"})
   }
 }
+
+exports.addComment = (req,res) => {
+
+}
+
+exports.removeComment = (req,res) => {
+  
+}
