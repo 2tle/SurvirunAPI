@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_PATH=index node index",
+    "start": "node index",
     "dev": "NODE_PATH=index nodemon --watch index.js"
   },
   "keywords": [],
