@@ -132,12 +132,14 @@ exports.getUserByUsername = (req, res) => {
   }
 
   const dataProcess = (user) => {
-    const userJson = {
-      "_id": user[0]._id,
-      "email": user[0].email,
-      "username": user[0].username
+    const exd = Exercise.find({uid: user[0]._id}).sort({"date":-1}).limit(7)
+	const userJson = {
+    	"_id": user[0]._id,
+    	"email": user[0].email,
+		"username": user[0].username,
+		"exerciseHistory": exd
     }
-
+	
     return res.status(200).json(userJson)
   }
 
@@ -202,12 +204,14 @@ exports.getUserByEmail = (req, res) => {
   }
 
   const dataProcess = (user) => {
-    const userJson = {
-      "_id": user[0]._id,
-      "email": user[0].email,
-      "username": user[0].username
+	const exd = Exercise.find({uid: user[0]._id}).sort({"date":-1}).limit(7)
+	const userJson = {
+    	"_id": user[0]._id,
+    	"email": user[0].email,
+		"username": user[0].username,
+		"exerciseHistory": exd
     }
-
+	
     return res.status(200).json(userJson)
   }
 
@@ -288,7 +292,7 @@ exports.createNewUser = (req, res) => {
 }
 
 /**
- * @api {post} /api/v1/auth/new Request to login
+ * @api {post} /api/v1/auth/local Request to login
  * @apiName Login
  * @apiGroup User
  * @apiBody {String} email

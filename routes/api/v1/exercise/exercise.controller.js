@@ -6,6 +6,29 @@ const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const crypto = require('crypto')
 
+
+/**
+ * @api {get} /api/v1/exercise Request to get today exercise data
+ * @apiName GetTodayExercise
+ * @apiGroup Exercise
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiSuccess {Exercise} exerciseHistory user's today exercise
+ * @apiErrorExample {json} Not Found email:
+ *     HTTP/1.1 500 Internal Server Error
+ *     { 
+ * 			error: "something error msg" 
+ *     }
+ * @apiSuccessExample {json} Success:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "exerciseHistory": {
+			"calorie":10
+			"km":0.045,
+			"time": 4312,
+			"date":"20210913"
+		}		
+ *     }
+ */
 exports.getExerciseData = (req, res) => { //today
   const getData = () => {
 	const currentTime = new Date()
@@ -32,9 +55,5 @@ exports.getExerciseData = (req, res) => { //today
 }
 
 exports.updateExerciseData = (req,res) => {
-
-}
-
-exports.getExerciseDataForUUID = (req,res) => {
-  
+	
 }
