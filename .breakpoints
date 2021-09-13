@@ -1,0 +1,12 @@
+{
+  "files": {
+    "routes/api/v1/auth/auth.controller.js": [
+      {
+        "id": "13380b37-1eac-4614-a570-dc573e9ee06b",
+        "line": 50,
+        "version": 5863,
+        "index": 1420
+      }
+    ]
+  }
+}

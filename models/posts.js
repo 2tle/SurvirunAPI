@@ -16,7 +16,6 @@ const Posts = new Schema({
     type: String,
   },
   likes: [],
-  comments: [[]],
   options: {
 
   },

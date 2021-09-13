@@ -1,4 +1,5 @@
 const User = require('../../../../models/user')
+const Exercise = require('../../../../models/Exercise')
 const config = require('../../../../config.js')
 const path = require('path')
 
@@ -7,30 +8,38 @@ const jwt = require('jsonwebtoken')
 const multer = require('multer')
 
 const crypto = require('crypto')
-/* 
-[GET] /api/v1/auth/by-username/{username}/exists
-{
-  exists: true
-}
-유저가 존재하면 200코드 및 true 반환,
-존재하지 않으면 404코드 및 false 반환
-*/
 
+/**
+ * @api {get} /api/v1/auth/by-username/:username/exists Request to check who has username
+ * @apiName CheckUserWhohasUsername
+ * @apiGroup User
+ * @apiParam {String} username username
+ * @apiSuccess {Boolean} exists If someone already had username, return true. If nobody had username, return false.
+ * @apiSuccessExample {json} Nobody uses username:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "exists": false
+ *     }
+ * @apiSuccessExample {json} Someone uses username:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "exists": true
+ *     }
+ */
 exports.usernameExists = (req, res) => {
-  const username = req.params.username
-  console.log(`/api/v1/auth/` + username + `/exists called`)
-  if (!username) return res.status(400).json({ error: "username must not be null" })
 
   const getUser = (username) => {
     return User.find({ username: username }).exec()
   }
 
   const check = (user) => {
-    if (!user.length) return res.status(404).json({ exists: false })
+    if (!user.length) return res.status(200).json({ exists: false })
     else return res.status(200).json({ exists: true })
   }
 
   try {
+    const username = req.params.username
+    if (!username) return res.status(400).json({ error: "username must not be null" })
     getUser(username).then(check)
   } catch (err) {
     console.error(err.message)
@@ -38,55 +47,80 @@ exports.usernameExists = (req, res) => {
   }
 }
 
-/* 
-[GET] /api/v1/auth/by-email/{email}/exists
-{
-  exists: true
-}
-유저가 존재하면 200코드 및 true 반환,
-존재하지 않으면 404코드 및 false 반환
-*/
-
+/**
+ * @api {get} /api/v1/auth/by-email/:email/exists Request to check who has email
+ * @apiName CheckUserWhohasEmail
+ * @apiGroup User
+ * @apiParam {String} email email
+ * @apiSuccess {Boolean} exists If someone already had email, return true. If nobody had email, return false.
+ * @apiSuccessExample {json} Nobody uses email:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "exists": false
+ *     }
+ * @apiSuccessExample {json} Someone uses email:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "exists": true
+ *     }
+ */
 exports.emailExists = (req, res) => {
-  const email = req.params.email
-  console.log(`/api/v1/auth/by-email/` + email + `/exists called`)
-  if (!email) return res.status(400).json({ error: "email must not be null" })
+  
 
   const getUser = (email) => {
     return User.find({ email: email }).exec()
   }
 
   const check = (user) => {
-    if (!user.length) return res.status(404).json({ exists: false })
+    if (!user.length) return res.status(200).json({ exists: false })
     else return res.status(200).json({ exists: true })
   }
 
   try {
+    const email = req.params.email
+    if (!email) return res.status(400).json({ error: "email must not be null" })
     getUser(email).then(check)
   } catch (err) {
     console.error(err.message)
-    return res.status(500).json({ error: "Internal Server Error" })
+    return res.status(500).json({ error: err.message })
   }
 }
 
 
-/* 
-[GET] /api/v1/auth/by-username/{username}
-{
-  user: {
-    _id: "",
-    email: "",
-    username: ""
-  }
-}
-유저가 존재하면 200코드 및 유저데이터 반환,
-존재하지 않으면 404코드 null 반환
-*/
+/**
+ * @api {get} /api/v1/auth/by-username/:username Request to get user by username
+ * @apiName GetUserByUsername
+ * @apiGroup User
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiParam {String} username username
+ * @apiSuccess {User} user UserData
+ * @apiErrorExample {json} Not Found username:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *     	 user: null
+ *     }
+ * @apiSuccessExample {json} Success:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       user: {
+    		"_id": "3cda3912...",
+    		"email": "test@test.com",
+    		"username": "testUsername",
+			"exerciseHistory": [
+				{
+					"calorie":10
+					"km":0.045,
+					"time": 4312,
+					"date":"20210913"
+				},
+				...
+			]
 
+  		}
+ *     }
+ */
 exports.getUserByUsername = (req, res) => {
-  const username = req.params.username
-  console.log(`/api/v1/auth/by-username/` + username + ` called`)
-  if (!username) return res.status(400).json({ error: "username must not be null" })
+  
 
   const getUser = (username) => {
     return User.find({ username: username }).exec()
@@ -108,10 +142,12 @@ exports.getUserByUsername = (req, res) => {
   }
 
   try {
+    const username = req.params.username
+    if (!username) return res.status(400).json({ error: "username must not be null" })
     getUser(username).then(check).then(dataProcess)
   } catch (err) {
     console.error(err.message)
-    return res.status(500).json({ error: "Internal Server Error" })
+    return res.status(500).json({ error: err.message })
   }
 }
 
@@ -120,23 +156,41 @@ exports.getUserByUsername = (req, res) => {
 
 
 
-/* 
-[GET] /api/v1/auth/by-email/:email
-{
-  user: {
-    _id: "",
-    email: "",
-    username: ""
-  }
-}
-유저가 존재하면 200코드 및 유저데이터 반환,
-존재하지 않으면 404코드 null 반환
-*/
 
+/**
+ * @api {get} /api/v1/auth/by-email/:email Request to get user by email
+ * @apiName GetUserByEmail
+ * @apiGroup User
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiParam {String} email email
+ * @apiSuccess {User} user UserData
+ * @apiErrorExample {json} Not Found email:
+ *     HTTP/1.1 404 Not Found
+ *     {
+ *     	 user: null
+ *     }
+ * @apiSuccessExample {json} Success:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       user: {
+    		"_id": "3cda3912...",
+    		"email": "test@test.com",
+    		"username": "testUsername",
+			"exerciseHistory": [
+				{
+					"calorie":10
+					"km":0.045,
+					"time": 4312,
+					"date":"20210913"
+				},
+				...
+			]
+
+  		}
+ *     }
+ */
 exports.getUserByEmail = (req, res) => {
-  const email = req.params.email
-  console.log(`/api/v1/auth/by-email/` + email + ` called`)
-  if (!email) return res.status(400).json({ error: "email must not be null" })
+  
 
   const getUser = (email) => {
     return User.find({ email: email }).exec()
@@ -158,10 +212,12 @@ exports.getUserByEmail = (req, res) => {
   }
 
   try {
+    const email = req.params.email
+    if (!email) return res.status(400).json({ error: "email must not be null" })
     getUser(email).then(check).then(dataProcess)
   } catch (err) {
     console.error(err.message)
-    return res.status(500).json({ error: "Internal Server Error" })
+    return res.status(500).json({ error: err.message })
   }
 }
 
@@ -171,22 +227,33 @@ exports.getUserByEmail = (req, res) => {
 
 
 
-
-/* 
-[POST] /api/v1/auth/new
-{
-  token:""
-}
-*/
+/**
+ * @api {post} /api/v1/auth/new Request to create new user
+ * @apiName CreateNewUser
+ * @apiGroup User
+ * @apiBody {String} username
+ * @apiBody {String} email
+ * @apiBody {String} password 
+ * @apiSuccess {String} token user's jwt token
+ * @apiErrorExample {json} Not Found email:
+ *     HTTP/1.1 400 Bad Request
+ *     { 
+ * 			error: "Data must not be null" 
+ *     }
+ * @apiSuccessExample {json} Success:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "token":"eyJwe..."
+ *     }
+ */
 exports.createNewUser = (req, res) => {
-  const { email, username } = req.body;
-  if (email == "" || username == "" || req.body.password == "") {
-    return res.status(400).json({ error: "Data must not be null" })
-  }
-  const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
 
   const createUser = (email, username, password) => {
     const newUser = new User({ email: email, username: username, password: password })
+	const currentTime = new Date()
+	const currentTimeToStr = currentTime.getFullYear() + currentTime.getMonth() + currentTime.getDate();
+    const exercise = new Exercise({uid: newUser._id, calorie: 0, km :0,time:0, date: currentTimeToStr})
+    const d = exercise.save()
     return newUser.save()
   }
 
@@ -207,20 +274,40 @@ exports.createNewUser = (req, res) => {
   }
 
   try {
+    const { email, username } = req.body;
+    if (email == "" || username == "" || req.body.password == "") {
+      return res.status(400).json({ error: "Data must not be null" })
+    }
+    const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
     createUser(email, username, password).then(createToken)
   } catch (err) {
     console.error(err.message)
-    return res.status(500).json({ error: "Internal Server Error" })
+    return res.status(500).json({ error: err.message })
   }
 
 }
 
+/**
+ * @api {post} /api/v1/auth/new Request to login
+ * @apiName Login
+ * @apiGroup User
+ * @apiBody {String} email
+ * @apiBody {String} password 
+ * @apiSuccess {String} token user's jwt token
+ * @apiErrorExample {json} Not Found email:
+ *     HTTP/1.1 400 Bad Request
+ *     { 
+ * 			error: "Data must not be null" 
+ *     }
+ * @apiSuccessExample {json} Success:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "token":"eyJwe..."
+ *     }
+ */
+
 exports.createToken = (req, res) => {
-  if (req.body.email == "" || req.body.password == "") {
-    return res.status(400).json({ error: "Data must not be null" })
-  }
-  const email = req.body.email;
-  const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
+  
   const getUser = (email, password) => {
     return User.findOne({ email: email, password: password }).exec()
   }
@@ -242,18 +329,22 @@ exports.createToken = (req, res) => {
   }
 
   try {
+    if (req.body.email == "" || req.body.password == "") {
+      return res.status(400).json({ error: "Data must not be null" })
+    }
+    const email = req.body.email;
+    const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
     getUser(email, password).then(createToken)
   } catch (err) {
     console.error(err.message)
-    return res.status(500).json({ error: "Internal Server Error" })
+    return res.status(500).json({ error: err.message})
   }
 }
 
 
-
+// deprecated.. maybe?
 exports.uploadProfileImage = (req, res) => {
   try {
-    console.log("POST /api/v1/auth/profile called")
     const upload = multer({
       storage: multer.diskStorage({
         destination: function (req1, file, cb) {

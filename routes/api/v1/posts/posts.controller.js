@@ -15,37 +15,35 @@ const crypto = require('crypto')
     title: "",
     text: "",
     created: "",
-    likes: [],
-    comments: []
+    likes: []
 
   },...]
 }
 */
-exports.getPost = (req,res) => {
-  const getPost = (req,res) => {
+exports.getPost = (req, res) => {
+  const getPost = (req, res) => {
     return Posts.find().exec()
   }
   const check = (posts) => {
-    if(!posts.length) return res.status(404).json({posts: null})
+    if (!posts.length) return res.status(404).json({ posts: null })
     else return posts
   }
   const post = (posts) => {
-    return res.status(200).json({posts: posts})
+    return res.status(200).json({ posts: posts })
   }
   try {
-    console.log('/api/v1/posts called')
     getPost().then(check).then(post)
   } catch (err) {
     console.error(err.message)
-    return res.status(500).json({error: "Internal Server Error"})
+    return res.status(500).json({ error: err.message })
   }
 
 }
 
-exports.createPost = (req,res) => {
+exports.createPost = (req, res) => {
 
   const uploadPost = () => {
-    const newPost = new Posts({uid: res.locals._id, title: req.body.title, text: req.body.text, created: moment().format('YYYY-MM-DD') , likes: [], comments: [], options: []})
+    const newPost = new Posts({ uid: res.locals._id, title: req.body.title, text: req.body.text, created: moment().format('YYYY-MM-DD'), likes: [], options: [] })
     return newPost.save()
   }
 
@@ -54,65 +52,96 @@ exports.createPost = (req,res) => {
   }
 
   try {
-    console.log('/api/v1/posts called')
-    if( !req.body.title || !req.body.text) {
-      return res.status(400).json({error: "Data must not be null"})
+    if (!req.body.title || !req.body.text) {
+      return res.status(400).json({ error: "Data must not be null" })
     }
     uploadPost().then(returnResult)
-  } catch(err) {
+  } catch (err) {
     console.error(err)
-    return res.status(500).json({error: "Internal Server Error"})
+    return res.status(500).json({ error: err.message })
   }
 }
 
-exports.addLikes = (req,res) => {
+exports.deletePost = (req, res) => {
+  const getPost = (postid) => {
+    return Posts.findOne({ _id: postid }).exec()
+  }
+  const checkAndDelete = (p) => {
+    if (p.uid == res.locals._id) {
+      return Posts.deleteOne({ _id: p._id }).exec()
+    } else {
+      return res.status(400).json({ error: "Not post's writer" })
+    }
+  }
+
+  const sendRes = (d) => {
+    if (d) {
+      return res.status(200).json({ result: true })
+    }
+  }
+
+  try {
+    getPost(req.params.id).then(checkAndDelete).then(sendRes)
+  } catch (err) {
+    console.error(err)
+    returnres.status(500).json({ error: err.message })
+  }
+
+}
+
+
+
+
+
+exports.addLikes = (req, res) => {
   const getPost = () => {
-    return Posts.findOne({_id: req.params.id}).exec()
+    return Posts.findOne({ _id: req.params.id }).exec()
   }
   const updatePost = (post) => {
-    console.log(res.locals._id)
-    console.log(post.likes)
     var arr = post.likes;
     arr.push(res.locals._id)
-    return Posts.updateOne({_id: req.params.id}, { $set: { likes:arr} }).exec()
+    return Posts.updateOne({ _id: req.params.id }, { $set: { likes: arr } }).exec()
   }
   const returnResult = (post) => {
-    return res.status(200).json({result: true})
+    return res.status(200).json({ result: true })
   }
   try {
     getPost().then(updatePost).then(returnResult)
   } catch (err) {
     console.error(err)
-    return res.status(500).json({error: "Internal Server Error"})
+    return res.status(500).json({ error: err.message })
   }
 }
 
-exports.minusLikes = (req,res) => {
+exports.minusLikes = (req, res) => {
   const getPost = () => {
-    return Posts.findOne({_id: req.params.id}).exec()
+    return Posts.findOne({ _id: req.params.id }).exec()
   }
   const updatePost = (post) => {
-    console.log(res.locals._id)
-    console.log(post.likes)
     var arr = post.likes;
-    arr.push(res.locals._id)
-    return Posts.updateOne({_id: req.params.id}, { $set: { likes:arr} }).exec()
+    var arr1 = arr.filter((el) => el != res.locals._id)
+    return Posts.updateOne({ _id: req.params.id }, { $set: { likes: arr1 } }).exec()
   }
   const returnResult = (post) => {
-    return res.status(200).json({result: true})
+    return res.status(200).json({ result: true })
   }
   try {
     getPost().then(updatePost).then(returnResult)
   } catch (err) {
     console.error(err)
-    return res.status(500).json({error: "Internal Server Error"})
+    return res.status(500).json({ error: err.message })
   }
 }
 
-exports.addComment = (req,res) => {
+exports.getComment = (req, res) => {
 
 }
 
-exports.removeComment = (req,res) => {
-  
+exports.addComment = (req, res) => { // db따로
+  //const   
 }
+
+exports.removeComment = (req, res) => {
+
+}
+
