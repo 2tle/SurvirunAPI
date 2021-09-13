@@ -1,7 +1,415 @@
 define({ "api": [
   {
+    "type": "post",
+    "url": "/api/v1/auth/new",
+    "title": "Request to create new user",
+    "name": "CreateNewUser",
+    "group": "Auth",
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "username",
+        "description": ""
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "email",
+        "description": ""
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "password",
+        "description": ""
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"token\":\"eyJwe...\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Not Found email:",
+          "content": "HTTP/1.1 400 Bad Request\n{ \n\terror: \"Data must not be null\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "Auth"
+  },
+  {
     "type": "get",
-    "url": "/api/v1/exercise/",
+    "url": "/api/v1/auth/jwt-decode",
+    "title": "Request to decode jwt token",
+    "name": "DecodeJwtToken",
+    "group": "Auth",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "_id",
+            "description": "<p>user's id</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "email",
+            "description": "<p>user's email</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>user's username</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "iat",
+            "description": "<p>time that created token</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "exp",
+            "description": "<p>time that will expire token</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "iss",
+            "description": "<p>token issur</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "sub",
+            "description": "<p>token info</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"_id\": \"613d65b91ef2af056a355438\",\n\t\"email\": \"taljosun\",\n\t\"username\": \"commonLicense\",\n\t\"iat\": 1631533262,\n\t\"exp\": 1631576462,\n\t\"iss\": \"studyRestAPI.2tle.repl.co\",\n\t\"sub\": \"userinfo\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "Auth"
+  },
+  {
+    "type": "delete",
+    "url": "/api/v1/auth/local",
+    "title": "Request to delete user",
+    "name": "DeletePassword",
+    "group": "Auth",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "password",
+        "description": "<p>password</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>true or false</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "Auth"
+  },
+  {
+    "type": "post",
+    "url": "/api/v1/auth/local",
+    "title": "Request to login",
+    "name": "Login",
+    "group": "Auth",
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "email",
+        "description": ""
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "password",
+        "description": ""
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"token\":\"eyJwe...\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Not Found email:",
+          "content": "HTTP/1.1 400 Bad Request\n{ \n\terror: \"Data must not be null\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "Auth"
+  },
+  {
+    "type": "patch",
+    "url": "/api/v1/auth/password",
+    "title": "Request to update password",
+    "name": "UpdatePassword",
+    "group": "Auth",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "changePassword",
+        "description": "<p>changePassword</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>true or false</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "Auth"
+  },
+  {
+    "type": "patch",
+    "url": "/api/v1/auth/by-username/:username",
+    "title": "Request to update username",
+    "name": "UpdateUsername",
+    "group": "Auth",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>username that will update</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>true or false</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "Auth"
+  },
+  {
+    "type": "get",
+    "url": "/api/v1/exercise",
     "title": "Request to get today exercise data",
     "name": "GetTodayExercise",
     "group": "Exercise",
@@ -33,7 +441,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success:",
-          "content": "    HTTP/1.1 200 OK\n    {\n      \"exerciseHistory\": {\n\t\t\t\"calorie\":10\n\t\t\t\"km\":0.045,\n\t\t\t\"time\": 4312,\n\t\t\t\"date\":\"20210913\"\n\t\t}\t\t\n    }",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"calorie\":10\n\t\"km\":0.045,\n\t\"time\": 4312,\n\t\"date\":\"2021-09-13\"\t\n}",
           "type": "json"
         }
       ]
@@ -42,7 +450,12 @@ define({ "api": [
       "examples": [
         {
           "title": "Not Found email:",
-          "content": "    HTTP/1.1 500 Internal Server Error\n    { \n\t\t\terror: \"something error msg\" \n    }",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
           "type": "json"
         }
       ]
@@ -50,6 +463,281 @@ define({ "api": [
     "version": "0.0.0",
     "filename": "routes/api/v1/exercise/exercise.controller.js",
     "groupTitle": "Exercise"
+  },
+  {
+    "type": "patch",
+    "url": "/api/v1/exercise",
+    "title": "Request to update User's Exercise data",
+    "name": "UpdateTodayExercise",
+    "group": "Exercise",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "calorie",
+        "description": "<p>user's today exercise: calorie</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "km",
+        "description": "<p>user's today exercise: running km</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "time",
+        "description": "<p>user's today exercise: time (second)</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "date",
+            "description": "<p>user's today exercise</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "calorie",
+            "description": "<p>user's today exercise: calorie</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km",
+            "description": "<p>user's today exercise: running km</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "time",
+            "description": "<p>user's today exercise: time (second)</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"calorie\":10\n\t\"km\":0.045,\n\t\"time\": 4312,\n\t\"date\":\"2021-09-13\"\t\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Not Found email:",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/api/v1/exercise/exercise.controller.js",
+    "groupTitle": "Exercise"
+  },
+  {
+    "type": "post",
+    "url": "/api/v1/friend",
+    "title": "Request to add user's friend",
+    "name": "AddFriendList",
+    "group": "Friend",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "username",
+        "description": "<p>friend's username</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>true or false</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/api/v1/friend/friend.controller.js",
+    "groupTitle": "Friend"
+  },
+  {
+    "type": "get",
+    "url": "/api/v1/friend/list",
+    "title": "Request to get user's friend list",
+    "name": "GetFriendList",
+    "group": "Friend",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "List",
+            "optional": false,
+            "field": "friends",
+            "description": "<p>friends list</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"friends\": [\n\t\t{username: \"Lux\"},\n\t\t{username: \"Ashe\"},\n\t\t...\n\t]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/api/v1/friend/friend.controller.js",
+    "groupTitle": "Friend"
+  },
+  {
+    "type": "delete",
+    "url": "/api/v1/friend",
+    "title": "Request to remove user's friend",
+    "name": "RemoveFriendList",
+    "group": "Friend",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "username",
+        "description": "<p>friend's username</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>true or false</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/api/v1/friend/friend.controller.js",
+    "groupTitle": "Friend"
   },
   {
     "type": "get",
@@ -85,12 +773,12 @@ define({ "api": [
       "examples": [
         {
           "title": "Nobody uses email:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"exists\": false\n}",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"exists\": false\n}",
           "type": "json"
         },
         {
           "title": "Someone uses email:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"exists\": true\n}",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"exists\": true\n}",
           "type": "json"
         }
       ]
@@ -133,74 +821,12 @@ define({ "api": [
       "examples": [
         {
           "title": "Nobody uses username:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"exists\": false\n}",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"exists\": false\n}",
           "type": "json"
         },
         {
           "title": "Someone uses username:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"exists\": true\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "version": "0.0.0",
-    "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "User"
-  },
-  {
-    "type": "post",
-    "url": "/api/v1/auth/new",
-    "title": "Request to create new user",
-    "name": "CreateNewUser",
-    "group": "User",
-    "body": [
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "username",
-        "description": ""
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "email",
-        "description": ""
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "password",
-        "description": ""
-      }
-    ],
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "token",
-            "description": "<p>user's jwt token</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"token\":\"eyJwe...\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "examples": [
-        {
-          "title": "Not Found email:",
-          "content": "    HTTP/1.1 400 Bad Request\n    { \n\t\t\terror: \"Data must not be null\" \n    }",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"exists\": true\n}",
           "type": "json"
         }
       ]
@@ -256,7 +882,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success:",
-          "content": "    HTTP/1.1 200 OK\n    {\n      user: {\n    \t\t\"_id\": \"3cda3912...\",\n    \t\t\"email\": \"test@test.com\",\n    \t\t\"username\": \"testUsername\",\n\t\t\t\"exerciseHistory\": [\n\t\t\t\t{\n\t\t\t\t\t\"calorie\":10\n\t\t\t\t\t\"km\":0.045,\n\t\t\t\t\t\"time\": 4312,\n\t\t\t\t\t\"date\":\"20210913\"\n\t\t\t\t},\n\t\t\t\t...\n\t\t\t]\n\n  \t\t}\n    }",
+          "content": "\tHTTP/1.1 200 OK\n\t{\n\t\tuser: {\n    \t\t\"_id\": \"3cda3912...\",\n    \t\t\"email\": \"test@test.com\",\n    \t\t\"username\": \"testUsername\",\n\t\t\t\"exerciseHistory\": [\n\t\t\t\t{\n\t\t\t\t\t\"calorie\":10\n\t\t\t\t\t\"km\":0.045,\n\t\t\t\t\t\"time\": 4312,\n\t\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t\t},\n\t\t\t\t...\n\t\t\t]\n\n  \t\t}\n\t}",
           "type": "json"
         }
       ]
@@ -265,7 +891,12 @@ define({ "api": [
       "examples": [
         {
           "title": "Not Found email:",
-          "content": "HTTP/1.1 404 Not Found\n{\n\t user: null\n}",
+          "content": "HTTP/1.1 404 Not Found\n{\n\tuser: null\n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
           "type": "json"
         }
       ]
@@ -321,7 +952,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success:",
-          "content": "    HTTP/1.1 200 OK\n    {\n      user: {\n    \t\t\"_id\": \"3cda3912...\",\n    \t\t\"email\": \"test@test.com\",\n    \t\t\"username\": \"testUsername\",\n\t\t\t\"exerciseHistory\": [\n\t\t\t\t{\n\t\t\t\t\t\"calorie\":10\n\t\t\t\t\t\"km\":0.045,\n\t\t\t\t\t\"time\": 4312,\n\t\t\t\t\t\"date\":\"20210913\"\n\t\t\t\t},\n\t\t\t\t...\n\t\t\t]\n\n  \t\t}\n    }",
+          "content": "\tHTTP/1.1 200 OK\n\t{\n     user: {\n    \t\t\"_id\": \"3cda3912...\",\n    \t\t\"email\": \"test@test.com\",\n    \t\t\"username\": \"testUsername\",\n\t\t\t\"exerciseHistory\": [\n\t\t\t\t{\n\t\t\t\t\t\"calorie\":10\n\t\t\t\t\t\"km\":0.045,\n\t\t\t\t\t\"time\": 4312,\n\t\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t\t},\n\t\t\t\t...\n\t\t\t]\n\n  \t\t}\n\t}",
           "type": "json"
         }
       ]
@@ -330,62 +961,12 @@ define({ "api": [
       "examples": [
         {
           "title": "Not Found username:",
-          "content": "HTTP/1.1 404 Not Found\n{\n\t user: null\n}",
+          "content": "HTTP/1.1 404 Not Found\n{\n\tuser: null\n}",
           "type": "json"
-        }
-      ]
-    },
-    "version": "0.0.0",
-    "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "User"
-  },
-  {
-    "type": "post",
-    "url": "/api/v1/auth/new",
-    "title": "Request to login",
-    "name": "Login",
-    "group": "User",
-    "body": [
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "email",
-        "description": ""
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "password",
-        "description": ""
-      }
-    ],
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "token",
-            "description": "<p>user's jwt token</p>"
-          }
-        ]
-      },
-      "examples": [
+        },
         {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n  \"token\":\"eyJwe...\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "examples": [
-        {
-          "title": "Not Found email:",
-          "content": "    HTTP/1.1 400 Bad Request\n    { \n\t\t\terror: \"Data must not be null\" \n    }",
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
           "type": "json"
         }
       ]

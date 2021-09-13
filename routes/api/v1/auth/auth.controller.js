@@ -1,5 +1,6 @@
 const User = require('../../../../models/user')
 const Exercise = require('../../../../models/Exercise')
+const Friend = require('../../../../models/Friend')
 const config = require('../../../../config.js')
 const path = require('path')
 
@@ -16,35 +17,35 @@ const crypto = require('crypto')
  * @apiParam {String} username username
  * @apiSuccess {Boolean} exists If someone already had username, return true. If nobody had username, return false.
  * @apiSuccessExample {json} Nobody uses username:
- *     HTTP/1.1 200 OK
- *     {
- *       "exists": false
- *     }
+ *	HTTP/1.1 200 OK
+ *	{
+ * 		"exists": false
+ *	}
  * @apiSuccessExample {json} Someone uses username:
- *     HTTP/1.1 200 OK
- *     {
- *       "exists": true
- *     }
+ *	HTTP/1.1 200 OK
+ *	{
+ *		"exists": true
+ *	}
  */
 exports.usernameExists = (req, res) => {
 
-  const getUser = (username) => {
-    return User.find({ username: username }).exec()
-  }
+	const getUser = (username) => {
+		return User.find({ username: username }).exec()
+	}
 
-  const check = (user) => {
-    if (!user.length) return res.status(200).json({ exists: false })
-    else return res.status(200).json({ exists: true })
-  }
+	const check = (user) => {
+		if (!user.length) return res.status(200).json({ exists: false })
+		else return res.status(200).json({ exists: true })
+	}
 
-  try {
-    const username = req.params.username
-    if (!username) return res.status(400).json({ error: "username must not be null" })
-    getUser(username).then(check)
-  } catch (err) {
-    console.error(err.message)
-    return res.status(500).json({ error: "Internal Server Error" })
-  }
+	try {
+		const username = req.params.username
+		if (!username) return res.status(400).json({ error: "username must not be null" })
+		getUser(username).then(check)
+	} catch (err) {
+		console.error(err.message)
+		return res.status(500).json({ error: "Internal Server Error" })
+	}
 }
 
 /**
@@ -54,36 +55,36 @@ exports.usernameExists = (req, res) => {
  * @apiParam {String} email email
  * @apiSuccess {Boolean} exists If someone already had email, return true. If nobody had email, return false.
  * @apiSuccessExample {json} Nobody uses email:
- *     HTTP/1.1 200 OK
- *     {
- *       "exists": false
- *     }
+ *	HTTP/1.1 200 OK
+ * 	{
+ *		"exists": false
+ *	}
  * @apiSuccessExample {json} Someone uses email:
- *     HTTP/1.1 200 OK
- *     {
- *       "exists": true
- *     }
+ *	HTTP/1.1 200 OK
+ *	{
+ *		"exists": true
+ *	}
  */
 exports.emailExists = (req, res) => {
-  
 
-  const getUser = (email) => {
-    return User.find({ email: email }).exec()
-  }
 
-  const check = (user) => {
-    if (!user.length) return res.status(200).json({ exists: false })
-    else return res.status(200).json({ exists: true })
-  }
+	const getUser = (email) => {
+		return User.find({ email: email }).exec()
+	}
 
-  try {
-    const email = req.params.email
-    if (!email) return res.status(400).json({ error: "email must not be null" })
-    getUser(email).then(check)
-  } catch (err) {
-    console.error(err.message)
-    return res.status(500).json({ error: err.message })
-  }
+	const check = (user) => {
+		if (!user.length) return res.status(200).json({ exists: false })
+		else return res.status(200).json({ exists: true })
+	}
+
+	try {
+		const email = req.params.email
+		if (!email) return res.status(400).json({ error: "email must not be null" })
+		getUser(email).then(check)
+	} catch (err) {
+		console.error(err.message)
+		return res.status(500).json({ error: err.message })
+	}
 }
 
 
@@ -95,14 +96,19 @@ exports.emailExists = (req, res) => {
  * @apiParam {String} username username
  * @apiSuccess {User} user UserData
  * @apiErrorExample {json} Not Found username:
- *     HTTP/1.1 404 Not Found
- *     {
- *     	 user: null
- *     }
+ * 	HTTP/1.1 404 Not Found
+ * 	{
+ *		user: null
+ * 	}
+ * @apiErrorExample {json} Token Expired:
+ * 	HTTP/1.1 419
+ * 	{
+ *		"error": "Token Expired"
+ * 	}
  * @apiSuccessExample {json} Success:
- *     HTTP/1.1 200 OK
- *     {
- *       user: {
+ *	HTTP/1.1 200 OK
+ *	{
+ *      user: {
     		"_id": "3cda3912...",
     		"email": "test@test.com",
     		"username": "testUsername",
@@ -111,46 +117,46 @@ exports.emailExists = (req, res) => {
 					"calorie":10
 					"km":0.045,
 					"time": 4312,
-					"date":"20210913"
+					"date":"2021-09-13"
 				},
 				...
 			]
 
   		}
- *     }
+ *	}
  */
 exports.getUserByUsername = (req, res) => {
-  
 
-  const getUser = (username) => {
-    return User.find({ username: username }).exec()
-  }
 
-  const check = (user) => {
-    if (!user.length) return res.status(404).json({ user: null })
-    else return user
-  }
+	const getUser = (username) => {
+		return User.find({ username: username }).exec()
+	}
 
-  const dataProcess = (user) => {
-    const exd = Exercise.find({uid: user[0]._id}).sort({"date":-1}).limit(7)
-	const userJson = {
-    	"_id": user[0]._id,
-    	"email": user[0].email,
-		"username": user[0].username,
-		"exerciseHistory": exd
-    }
-	
-    return res.status(200).json(userJson)
-  }
+	const check = (user) => {
+		if (!user.length) return res.status(404).json({ user: null })
+		else return user
+	}
 
-  try {
-    const username = req.params.username
-    if (!username) return res.status(400).json({ error: "username must not be null" })
-    getUser(username).then(check).then(dataProcess)
-  } catch (err) {
-    console.error(err.message)
-    return res.status(500).json({ error: err.message })
-  }
+	const dataProcess = (user) => {
+		const exd = Exercise.find({ uid: user[0]._id }).sort({ "date": -1 }).limit(7)
+		const userJson = {
+			"_id": user[0]._id,
+			"email": user[0].email,
+			"username": user[0].username,
+			"exerciseHistory": exd
+		}
+
+		return res.status(200).json(userJson)
+	}
+
+	try {
+		const username = req.params.username
+		if (!username) return res.status(400).json({ error: "username must not be null" })
+		getUser(username).then(check).then(dataProcess)
+	} catch (err) {
+		console.error(err.message)
+		return res.status(500).json({ error: err.message })
+	}
 }
 
 
@@ -167,14 +173,19 @@ exports.getUserByUsername = (req, res) => {
  * @apiParam {String} email email
  * @apiSuccess {User} user UserData
  * @apiErrorExample {json} Not Found email:
- *     HTTP/1.1 404 Not Found
- *     {
- *     	 user: null
- *     }
+ *	HTTP/1.1 404 Not Found
+ * 	{
+ *		user: null
+ *	}
+ * @apiErrorExample {json} Token Expired:
+ *  HTTP/1.1 419
+ *  {
+ *  	"error": "Token Expired"
+ *  }
  * @apiSuccessExample {json} Success:
- *     HTTP/1.1 200 OK
- *     {
- *       user: {
+ *	HTTP/1.1 200 OK
+ * 	{
+ * 		user: {
     		"_id": "3cda3912...",
     		"email": "test@test.com",
     		"username": "testUsername",
@@ -183,46 +194,46 @@ exports.getUserByUsername = (req, res) => {
 					"calorie":10
 					"km":0.045,
 					"time": 4312,
-					"date":"20210913"
+					"date":"2021-09-13"
 				},
 				...
 			]
 
   		}
- *     }
+ * 	}
  */
 exports.getUserByEmail = (req, res) => {
-  
 
-  const getUser = (email) => {
-    return User.find({ email: email }).exec()
-  }
 
-  const check = (user) => {
-    if (!user.length) return res.status(404).json({ user: null })
-    else return user
-  }
+	const getUser = (email) => {
+		return User.find({ email: email }).exec()
+	}
 
-  const dataProcess = (user) => {
-	const exd = Exercise.find({uid: user[0]._id}).sort({"date":-1}).limit(7)
-	const userJson = {
-    	"_id": user[0]._id,
-    	"email": user[0].email,
-		"username": user[0].username,
-		"exerciseHistory": exd
-    }
-	
-    return res.status(200).json(userJson)
-  }
+	const check = (user) => {
+		if (!user.length) return res.status(404).json({ user: null })
+		else return user
+	}
 
-  try {
-    const email = req.params.email
-    if (!email) return res.status(400).json({ error: "email must not be null" })
-    getUser(email).then(check).then(dataProcess)
-  } catch (err) {
-    console.error(err.message)
-    return res.status(500).json({ error: err.message })
-  }
+	const dataProcess = (user) => {
+		const exd = Exercise.find({ uid: user[0]._id }).sort({ "date": -1 }).limit(7)
+		const userJson = {
+			"_id": user[0]._id,
+			"email": user[0].email,
+			"username": user[0].username,
+			"exerciseHistory": exd
+		}
+
+		return res.status(200).json(userJson)
+	}
+
+	try {
+		const email = req.params.email
+		if (!email) return res.status(400).json({ error: "email must not be null" })
+		getUser(email).then(check).then(dataProcess)
+	} catch (err) {
+		console.error(err.message)
+		return res.status(500).json({ error: err.message })
+	}
 }
 
 
@@ -234,137 +245,313 @@ exports.getUserByEmail = (req, res) => {
 /**
  * @api {post} /api/v1/auth/new Request to create new user
  * @apiName CreateNewUser
- * @apiGroup User
+ * @apiGroup Auth
  * @apiBody {String} username
  * @apiBody {String} email
  * @apiBody {String} password 
  * @apiSuccess {String} token user's jwt token
  * @apiErrorExample {json} Not Found email:
- *     HTTP/1.1 400 Bad Request
- *     { 
- * 			error: "Data must not be null" 
- *     }
+ *	HTTP/1.1 400 Bad Request
+ *	{ 
+ *		error: "Data must not be null" 
+ *	}
  * @apiSuccessExample {json} Success:
- *     HTTP/1.1 200 OK
- *     {
- *       "token":"eyJwe..."
- *     }
+ *	HTTP/1.1 200 OK
+ * 	{
+ * 		"token":"eyJwe..."
+ *	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+ *		"error": "Token Expired"
+ *	}
  */
 exports.createNewUser = (req, res) => {
 
-  const createUser = (email, username, password) => {
-    const newUser = new User({ email: email, username: username, password: password })
-	const currentTime = new Date()
-	const currentTimeToStr = currentTime.getFullYear() + currentTime.getMonth() + currentTime.getDate();
-    const exercise = new Exercise({uid: newUser._id, calorie: 0, km :0,time:0, date: currentTimeToStr})
-    const d = exercise.save()
-    return newUser.save()
-  }
+	const createUser = (email, username, password) => {
+		const newUser = new User({ email: email, username: username, password: password })
+		const currentTime = new Date()
+		const currentTimeToStr = currentTime.getFullYear() + '-' + (currentTime.getMonth() + 1) + '-' + currentTime.getDate();
+		const exercise = new Exercise({ uid: newUser._id, calorie: 0, km: 0, time: 0, date: currentTimeToStr })
+		const friend = new Friend({ uid: newUser._id, friends: [] })
+		const ee = friend.save()
+		const d = exercise.save()
+		return newUser.save()
+	}
 
-  const createToken = (user) => {
-    console.log(user)
-    const token = jwt.sign({
-      _id: user._id,
-      email: user.email,
-      username: user.username
-    }, config.secret, {
-        expiresIn: '12h',
-        subject: "userinfo",
-        issuer: config.hostname
-      })
-    res.status(200).json({
-      token: token
-    })
-  }
+	const createToken = (user) => {
+		console.log(user)
+		const token = jwt.sign({
+			_id: user._id,
+			email: user.email,
+			username: user.username
+		}, config.secret, {
+				expiresIn: '12h',
+				subject: "userinfo",
+				issuer: config.hostname
+			})
+		res.status(200).json({
+			token: token
+		})
+	}
 
-  try {
-    const { email, username } = req.body;
-    if (email == "" || username == "" || req.body.password == "") {
-      return res.status(400).json({ error: "Data must not be null" })
-    }
-    const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
-    createUser(email, username, password).then(createToken)
-  } catch (err) {
-    console.error(err.message)
-    return res.status(500).json({ error: err.message })
-  }
+	try {
+		const { email, username } = req.body;
+		if (email == ""|| req.body.password == "") {
+			return res.status(400).json({ error: "Data must not be null" })
+		}
+		const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
+		createUser(email, username, password).then(createToken)
+	} catch (err) {
+		console.error(err.message)
+		return res.status(500).json({ error: err.message })
+	}
 
 }
 
 /**
  * @api {post} /api/v1/auth/local Request to login
  * @apiName Login
- * @apiGroup User
+ * @apiGroup Auth
  * @apiBody {String} email
  * @apiBody {String} password 
  * @apiSuccess {String} token user's jwt token
  * @apiErrorExample {json} Not Found email:
- *     HTTP/1.1 400 Bad Request
- *     { 
- * 			error: "Data must not be null" 
- *     }
+ *	HTTP/1.1 400 Bad Request
+ *	{ 
+ *		error: "Data must not be null" 
+ *	}
  * @apiSuccessExample {json} Success:
- *     HTTP/1.1 200 OK
- *     {
- *       "token":"eyJwe..."
- *     }
+ *	HTTP/1.1 200 OK
+ *	{
+ *		"token":"eyJwe..."
+ *	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+ *		"error": "Token Expired"
+ *	}
  */
 
 exports.createToken = (req, res) => {
-  
-  const getUser = (email, password) => {
-    return User.findOne({ email: email, password: password }).exec()
-  }
+
+	const getUser = (email, password) => {
+		return User.findOne({ email: email, password: password }).exec()
+	}
 
 
-  const createToken = (user) => {
-    const token = jwt.sign({
-      _id: user._id,
-      email: user.email,
-      username: user.username
-    }, config.secret, {
-        expiresIn: '12h',
-        subject: "userinfo",
-        issuer: config.hostname
-      })
-    res.status(200).json({
-      token: token
-    })
-  }
+	const createToken = (user) => {
+		if (user != null) {
+			const token = jwt.sign({
+				_id: user._id,
+				email: user.email,
+				username: user.username
+			}, config.secret, {
+					expiresIn: '12h',
+					subject: "userinfo",
+					issuer: config.hostname
+				})
+			res.status(200).json({
+				token: token
+			})
+		} else {
+			res.status(404).json({
+				error: "Not Found User"
+			})
+		}
 
-  try {
-    if (req.body.email == "" || req.body.password == "") {
-      return res.status(400).json({ error: "Data must not be null" })
-    }
-    const email = req.body.email;
-    const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
-    getUser(email, password).then(createToken)
-  } catch (err) {
-    console.error(err.message)
-    return res.status(500).json({ error: err.message})
-  }
+	}
+
+	try {
+		if (req.body.email == "" || req.body.password == "") {
+			return res.status(400).json({ error: "Data must not be null" })
+		}
+		const email = req.body.email;
+		const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
+		getUser(email, password).then(createToken)
+	} catch (err) {
+		console.error(err.message)
+		return res.status(500).json({ error: err.message })
+	}
 }
 
 
 // deprecated.. maybe?
 exports.uploadProfileImage = (req, res) => {
-  try {
-    const upload = multer({
-      storage: multer.diskStorage({
-        destination: function (req1, file, cb) {
-          cb(null, 'images/');
-        },
-        filename: function (req1, file, cb) {
-          cb(null, res.locals._id+ path.extname(file.originalname));
-        }
-      })
-    });
-    return res.status(200).json({
-      location: "/images/"+res.locals._id+".png"
-    })
-    
-  } catch (e){
-    console.error(e.message)
-    return res.status(500).json({ error: e.message })
-  }
+	try {
+		const upload = multer({
+			storage: multer.diskStorage({
+				destination: function(req1, file, cb) {
+					cb(null, 'images/');
+				},
+				filename: function(req1, file, cb) {
+					cb(null, res.locals._id + path.extname(file.originalname));
+				}
+			})
+		});
+		return res.status(200).json({
+			location: "/images/" + res.locals._id + ".png"
+		})
+
+	} catch (e) {
+		console.error(e.message)
+		return res.status(500).json({ error: e.message })
+	}
+}
+
+
+/**
+ * @api {get} /api/v1/auth/jwt-decode Request to decode jwt token
+ * @apiName DecodeJwtToken
+ * @apiGroup Auth
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiSuccess {String} _id user's id
+ * @apiSuccess {String} email user's email
+ * @apiSuccess {String} username user's username
+ * @apiSuccess {String} iat time that created token
+ * @apiSuccess {String} exp time that will expire token
+ * @apiSuccess {String} iss token issur
+ * @apiSuccess {String} sub token info
+ * @apiSuccessExample {json} Success:
+ *	HTTP/1.1 200 OK
+ *	{
+ *		"_id": "613d65b91ef2af056a355438",
+ *		"email": "taljosun",
+ *		"username": "commonLicense",
+ *		"iat": 1631533262,
+ *		"exp": 1631576462,
+ *		"iss": "studyRestAPI.2tle.repl.co",
+ *		"sub": "userinfo"
+ *	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+ *		"error": "Token Expired"
+ *	}
+ */
+
+
+/**
+ * @api {patch} /api/v1/auth/by-username/:username Request to update username
+ * @apiName UpdateUsername
+ * @apiGroup Auth
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiParam {String} username username that will update
+ * @apiSuccess {Boolean} result true or false
+ * @apiSuccessExample {json} Success:
+ *	HTTP/1.1 200 OK
+ * 	{
+		"result": true
+	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+ *		"error": "Token Expired"
+ *	}
+ */
+exports.updateUsername = (req, res) => {
+	const update = (username) => {
+		return User.updateOne({ _id: res.locals._id }, { $set: { username: username } }).exec()
+	}
+	const send = (t) => {
+		return res.status(200).json({ result: true })
+	}
+	try {
+		if (req.params.username == "") {
+			return res.status(400).json({ error: "Data must not be null" })
+		}
+		update(req.params.username).then(send)
+	} catch (err) {
+		console.error(err)
+		return res.status(500).json({ error: err.message })
+	}
+}
+/**
+ * @api {patch} /api/v1/auth/password Request to update password
+ * @apiName UpdatePassword
+ * @apiGroup Auth
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiBody {String} changePassword changePassword
+ * @apiSuccess {Boolean} result true or false
+ * @apiSuccessExample {json} Success:
+ *	HTTP/1.1 200 OK
+ * 	{
+		"result": true
+	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+ *		"error": "Token Expired"
+ *	}
+ */
+exports.updatePassword = (req, res) => {
+	const update = () => {
+		const cpassword = crypto.createHash('sha512').update(req.body.changePassword).digest('base64')
+		return User.updateOne({ _id: res.locals._id }, { password: cpassword }).exec()
+
+	}
+	const send = (r) => {
+		return res.status(200).json({ result: true })
+	}
+	try {
+		update().then(send)
+	} catch (err) {
+		console.error(err)
+		return res.status(500).json({ error: err.message })
+	}
+}
+/**
+ * @api {delete} /api/v1/auth/local Request to delete user
+ * @apiName DeletePassword
+ * @apiGroup Auth
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiBody {String} password password
+ * @apiSuccess {Boolean} result true or false
+ * @apiSuccessExample {json} Success:
+ *	HTTP/1.1 200 OK
+ * 	{
+		"result": true
+	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+ *		"error": "Token Expired"
+ *	}
+ */
+exports.deleteUser = (req, res) => {
+	const getUser = (pw) => {
+		return User.findOne({ _id: res.locals._id, password: pw }).exec()
+	}
+	const delUser = (t) => {
+		if (t != null) return User.deleteOne({ _id: res.locals._id }).exec()
+		else return res.status(500).json({ error: "Not Found User" })
+	}
+	const delExercise = (t) => {
+		return Exercise.deleteMany({ uid: res.locals._id }).exec()
+	}
+	const delMyFriend = (t) => {
+		return Friend.deleteMany({ uid: res.locals._id }).exec()
+	}
+	const delFriendOthers = (t) => {
+		return Friend.update({}, {
+			'$pull': {
+				friends: {
+					uid: res.locals._id
+				}
+			}
+		})
+	}
+	const send = (t) => {
+		return res.status(200).json({ result: true })
+	}
+	try {
+		if (req.body.password == "") {
+			return res.status(400).json({ error: "Data must not be null" })
+		}
+		const pw = crypto.createHash('sha512').update(req.body.password).digest('base64')
+		getUser(pw).then(delUser).then(delExercise).then(delMyFriend).then(delFriendOthers).then(send)
+	} catch (err) {
+		console.error(err)
+		return res.status(500).json({ error: err.message })
+	}
 }

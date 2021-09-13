@@ -34,3 +34,20 @@ exports.verifyToken = (req, res, next) => {
     return res.status(500).json({error: err.message})
   }
 }
+
+exports.decodeJWTToken = (req,res) => {
+	const token = req.headers['x-access-token']
+  	if(!token) {
+    	return res.status(401).json({error: "Not logged in"})
+  	}
+	const dec = () => {
+		const e = jwt.decode(token, config.secret)
+		res.status(200).json(e)
+	}
+	try {
+		dec()
+	} catch (err) {
+		console.error(err)
+    	return res.status(500).json({error: err.message})
+	}
+}

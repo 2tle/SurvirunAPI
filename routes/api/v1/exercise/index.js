@@ -6,5 +6,6 @@ const multer = require('multer')
 const upload = multer({dest: 'images/',limits: { fileSize: 5 * 1024 * 1024 }})
 
 router.get('/',logMiddleware.consoleLog ,authMiddleware.verifyToken, controller.getExerciseData)
+router.patch('/',logMiddleware.consoleLog ,authMiddleware.verifyToken, controller.updateExerciseData)
 
 module.exports = router
