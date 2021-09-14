@@ -11,6 +11,7 @@ const crypto = require('crypto')
  * @api {get} /api/v1/friend/list Request to get user's friend list
  * @apiName GetFriendList
  * @apiGroup Friend
+ * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
  * @apiSuccess {List} friends friends list
  * @apiErrorExample {json} Token Expired:
@@ -60,6 +61,7 @@ exports.getFriendsList = (req,res) => {
  * @apiGroup Friend
  * @apiHeader {String} x-access-token user's jwt token
  * @apiBody {String} username friend's username
+ * @apiVersion 1.0.0
  * @apiSuccess {Boolean} result true or false
  * @apiSuccessExample {json} Success:
  *	HTTP/1.1 200 OK
@@ -118,6 +120,7 @@ exports.addFriend = (req,res) => {
  * @apiHeader {String} x-access-token user's jwt token
  * @apiBody {String} username friend's username
  * @apiSuccess {Boolean} result true or false
+ * @apiVersion 1.0.0
  * @apiSuccessExample {json} Success:
  *	HTTP/1.1 200 OK
  * 	{

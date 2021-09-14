@@ -3,17 +3,17 @@
     "routes/api/v1/auth/auth.controller.js": [
       {
         "id": "13380b37-1eac-4614-a570-dc573e9ee06b",
-        "line": 50,
-        "version": 7299,
-        "index": 1464
+        "line": 53,
+        "version": 10418,
+        "index": 1461
       }
     ],
     "routes/api/v1/friend/friend.controller.js": [
       {
         "id": "bdb8d729-f633-476d-b73d-b2d6a2c89fc8",
-        "line": 17,
-        "version": 1414,
-        "index": 524
+        "line": 16,
+        "version": 3565,
+        "index": 489
       }
     ]
   }

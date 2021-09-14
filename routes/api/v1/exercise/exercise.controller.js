@@ -11,6 +11,7 @@ const crypto = require('crypto')
  * @api {get} /api/v1/exercise Request to get today exercise data
  * @apiName GetTodayExercise
  * @apiGroup Exercise
+ * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
  * @apiSuccess {Exercise} exerciseHistory user's today exercise
  * @apiErrorExample {json} Not Found email:
@@ -81,6 +82,7 @@ exports.getExerciseData = (req, res) => { //today
  * @apiSuccess {Number} calorie user's today exercise: calorie
  * @apiSuccess {Number} km user's today exercise: running km
  * @apiSuccess {Number} time user's today exercise: time (second)
+ * @apiVersion 1.0.0
  * @apiErrorExample {json} Not Found email:
  *	HTTP/1.1 500 Internal Server Error
  * 	{ 

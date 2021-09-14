@@ -14,6 +14,7 @@ const crypto = require('crypto')
  * @api {get} /api/v1/auth/by-username/:username/exists Request to check who has username
  * @apiName CheckUserWhohasUsername
  * @apiGroup User
+ * @apiVersion 1.0.0
  * @apiParam {String} username username
  * @apiSuccess {Boolean} exists If someone already had username, return true. If nobody had username, return false.
  * @apiSuccessExample {json} Nobody uses username:
@@ -52,6 +53,7 @@ exports.usernameExists = (req, res) => {
  * @api {get} /api/v1/auth/by-email/:email/exists Request to check who has email
  * @apiName CheckUserWhohasEmail
  * @apiGroup User
+ * @apiVersion 1.0.0
  * @apiParam {String} email email
  * @apiSuccess {Boolean} exists If someone already had email, return true. If nobody had email, return false.
  * @apiSuccessExample {json} Nobody uses email:
@@ -92,6 +94,7 @@ exports.emailExists = (req, res) => {
  * @api {get} /api/v1/auth/by-username/:username Request to get user by username
  * @apiName GetUserByUsername
  * @apiGroup User
+ * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
  * @apiParam {String} username username
  * @apiSuccess {User} user UserData
@@ -169,6 +172,7 @@ exports.getUserByUsername = (req, res) => {
  * @api {get} /api/v1/auth/by-email/:email Request to get user by email
  * @apiName GetUserByEmail
  * @apiGroup User
+ * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
  * @apiParam {String} email email
  * @apiSuccess {User} user UserData
@@ -246,6 +250,7 @@ exports.getUserByEmail = (req, res) => {
  * @api {post} /api/v1/auth/new Request to create new user
  * @apiName CreateNewUser
  * @apiGroup Auth
+ * @apiVersion 1.0.0
  * @apiBody {String} username
  * @apiBody {String} email
  * @apiBody {String} password 
@@ -313,6 +318,7 @@ exports.createNewUser = (req, res) => {
  * @api {post} /api/v1/auth/local Request to login
  * @apiName Login
  * @apiGroup Auth
+ * @apiVersion 1.0.0
  * @apiBody {String} email
  * @apiBody {String} password 
  * @apiSuccess {String} token user's jwt token
@@ -404,6 +410,7 @@ exports.uploadProfileImage = (req, res) => {
  * @api {get} /api/v1/auth/jwt-decode Request to decode jwt token
  * @apiName DecodeJwtToken
  * @apiGroup Auth
+ * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
  * @apiSuccess {String} _id user's id
  * @apiSuccess {String} email user's email
@@ -435,6 +442,7 @@ exports.uploadProfileImage = (req, res) => {
  * @api {patch} /api/v1/auth/by-username/:username Request to update username
  * @apiName UpdateUsername
  * @apiGroup Auth
+ * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
  * @apiParam {String} username username that will update
  * @apiSuccess {Boolean} result true or false
@@ -470,6 +478,7 @@ exports.updateUsername = (req, res) => {
  * @api {patch} /api/v1/auth/password Request to update password
  * @apiName UpdatePassword
  * @apiGroup Auth
+ * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
  * @apiBody {String} changePassword changePassword
  * @apiSuccess {Boolean} result true or false
@@ -504,6 +513,7 @@ exports.updatePassword = (req, res) => {
  * @api {delete} /api/v1/auth/local Request to delete user
  * @apiName DeletePassword
  * @apiGroup Auth
+ * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
  * @apiBody {String} password password
  * @apiSuccess {Boolean} result true or false
