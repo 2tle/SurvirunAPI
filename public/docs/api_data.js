@@ -433,7 +433,7 @@ define({ "api": [
         "type": "String",
         "optional": false,
         "field": "date",
-        "description": "<p>(Optional) YYYY-MM-DD</p>"
+        "description": "<p>YYYY-MM-DD or &quot;&quot;</p>"
       }
     ],
     "success": {
@@ -890,7 +890,7 @@ define({ "api": [
     "groupTitle": "Friend"
   },
   {
-    "type": "delete",
+    "type": "patch",
     "url": "/api/v1/friend",
     "title": "Request to remove user's friend",
     "name": "RemoveFriendList",
@@ -1048,6 +1048,72 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/v1/auth/profile",
+    "title": "Request to get user's profile image",
+    "name": "GetProfileImage",
+    "group": "User",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "query": [
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "username",
+        "description": "<p>(Optional) if you want to other user's image, input it.</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object",
+            "optional": false,
+            "field": "img",
+            "description": "<p>ImageBuffer..</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"img\" : {\n\t\t\t\ttype : \"Buffer\",\n\t\t\t\tdata : Buffer(ex: [123,0,1,0,0,...])\n\t\t}\n\t\t\n\t]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Something Error:",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "get",
     "url": "/api/v1/auth/by-email/:email",
     "title": "Request to get user by email",
     "name": "GetUserByEmail",
@@ -1174,6 +1240,73 @@ define({ "api": [
         {
           "title": "Not Found username:",
           "content": "HTTP/1.1 404 Not Found\n{\n\tuser: null\n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "post",
+    "url": "/api/v1/auth/profile",
+    "title": "Request to update user's profile",
+    "name": "UploadProfileImage",
+    "description": "<p>Must USE Header :: Content-Type :  multipart/form-data</p>",
+    "group": "User",
+    "version": "1.0.0",
+    "body": [
+      {
+        "group": "Body",
+        "type": "Image",
+        "optional": false,
+        "field": "img",
+        "description": "<p>Image File</p>"
+      }
+    ],
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>true</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"result\" : true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Something Error:",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
           "type": "json"
         },
         {

@@ -7,6 +7,6 @@ const upload = multer({dest: 'images/',limits: { fileSize: 5 * 1024 * 1024 }})
 
 router.get('/list',logMiddleware.consoleLog, authMiddleware.verifyToken, controller.getFriendsList)
 router.post('/',logMiddleware.consoleLog, authMiddleware.verifyToken, controller.addFriend)
-router.delete('/',logMiddleware.consoleLog, authMiddleware.verifyToken, controller.removeFriend)
+router.patch('/',logMiddleware.consoleLog, authMiddleware.verifyToken, controller.removeFriend)
 
 module.exports = router

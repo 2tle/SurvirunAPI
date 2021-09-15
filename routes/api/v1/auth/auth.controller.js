@@ -1,6 +1,7 @@
 const User = require('../../../../models/user')
 const Exercise = require('../../../../models/Exercise')
 const Friend = require('../../../../models/Friend')
+const Profile = require('../../../../models/Profile')
 const config = require('../../../../config.js')
 const path = require('path')
 const moment = require('moment-timezone')
@@ -130,8 +131,8 @@ exports.emailExists = (req, res) => {
  */
 exports.getUserByUsername = (req, res) => {
 
-	var id1 =''
-	var email1 =''
+	var id1 = ''
+	var email1 = ''
 	var username1 = ''
 
 
@@ -148,10 +149,10 @@ exports.getUserByUsername = (req, res) => {
 		id1 = user[0]._id
 		email1 = user[0].email
 		username1 = user[0].username
-		return Exercise.find({ uid: user[0]._id },{_id:0, uid: 0,__v:0}).sort({ "date": -1 }).limit(7).exec()
-		
+		return Exercise.find({ uid: user[0]._id }, { _id: 0, uid: 0, __v: 0 }).sort({ "date": -1 }).limit(7).exec()
+
 	}
-	
+
 
 	const send = (d) => {
 		const userJson = {
@@ -165,7 +166,7 @@ exports.getUserByUsername = (req, res) => {
 
 	try {
 		const username = decodeURI(req.params.username)
-		
+
 		if (!username) return res.status(400).json({ error: "email must not be null" })
 		getUser(username).then(check).then(dataProcess).then(send)
 	} catch (err) {
@@ -219,8 +220,8 @@ exports.getUserByUsername = (req, res) => {
  * 	}
  */
 exports.getUserByEmail = (req, res) => {
-	var id1 =''
-	var email1 =''
+	var id1 = ''
+	var email1 = ''
 	var username1 = ''
 
 
@@ -237,10 +238,10 @@ exports.getUserByEmail = (req, res) => {
 		id1 = user[0]._id
 		email1 = user[0].email
 		username1 = user[0].username
-		return Exercise.find({ uid: user[0]._id },{_id:0, uid: 0,__v:0}).sort({ "date": -1 }).limit(7).exec()
-		
+		return Exercise.find({ uid: user[0]._id }, { _id: 0, uid: 0, __v: 0 }).sort({ "date": -1 }).limit(7).exec()
+
 	}
-	
+
 
 	const send = (d) => {
 		const userJson = {
@@ -254,7 +255,7 @@ exports.getUserByEmail = (req, res) => {
 
 	try {
 		const email = decodeURI(req.params.email)
-		
+
 		if (!email) return res.status(400).json({ error: "email must not be null" })
 		getUser(email).then(check).then(dataProcess).then(send)
 	} catch (err) {
@@ -324,7 +325,7 @@ exports.createNewUser = (req, res) => {
 
 	try {
 		const { email, username } = req.body;
-		if (email == ""|| req.body.password == "") {
+		if (email == "" || req.body.password == "") {
 			return res.status(400).json({ error: "Data must not be null" })
 		}
 		const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
@@ -404,26 +405,113 @@ exports.createToken = (req, res) => {
 }
 
 
-// deprecated.. maybe?
+/**
+ * @api {post} /api/v1/auth/profile Request to update user's profile
+ * @apiName UploadProfileImage
+ * @apiDescription Must USE Header :: Content-Type :  multipart/form-data
+ * @apiGroup User
+ * @apiVersion 1.0.0
+ * @apiBody {Image} img Image File
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiSuccess {Boolean} result true
+ * @apiErrorExample {json} Something Error:
+ *	HTTP/1.1 500 Internal Server Error
+ *	{ 
+ * 		error: "something error msg" 
+ *	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+ *		"error": "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} Success:
+ *	HTTP/1.1 200 OK
+ *	{
+		"result" : true
+ *	}
+ */
 exports.uploadProfileImage = (req, res) => {
-	try {
-		const upload = multer({
-			storage: multer.diskStorage({
-				destination: function(req1, file, cb) {
-					cb(null, 'images/');
-				},
-				filename: function(req1, file, cb) {
-					cb(null, res.locals._id + path.extname(file.originalname));
-				}
+	const findOne = () => {
+		return Profile.findOne({ uid: res.locals._id }).exec()
+	}
+	const uploadImg = (findOne) => {
+		const imgbuffer = req.file.buffer;
+		if (imgbuffer.truncated) {
+			return res.status(413).json({ error: "Payload Too Large" })
+		}
+		if (!findOne) {
+			const img = new Profile({
+				uid: res.locals._id,
+				img: imgbuffer
 			})
-		});
-		return res.status(200).json({
-			location: "/images/" + res.locals._id + ".png"
-		})
+			return img.save()
+		} else {
+			return Profile.update({ uid: res.locals._id }, { img: imgbuffer }).exec()
+		}
 
+
+	}
+
+	const send = (t) => {
+		return res.status(200).json({ result: true })
+	}
+
+	try {
+		//console.log(body)
+		if (req.file.buffer == "") {
+			return res.status(400).json({ error: "Data must not be null" })
+		}
+		findOne().then(uploadImg).then(send)
 	} catch (e) {
-		console.error(e.message)
+		console.error(e)
 		return res.status(500).json({ error: e.message })
+	}
+}
+
+/**
+ * @api {get} /api/v1/auth/profile Request to get user's profile image
+ * @apiName GetProfileImage
+ * @apiGroup User
+ * @apiVersion 1.0.0
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiQuery {String} username (Optional) if you want to other user's image, input it.
+ * @apiSuccess {Object} img ImageBuffer..
+ * @apiErrorExample {json} Something Error:
+ *	HTTP/1.1 500 Internal Server Error
+ *	{ 
+ * 		error: "something error msg" 
+ *	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+ *		"error": "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} Success:
+ *	HTTP/1.1 200 OK
+ *	{
+		"img" : {
+					type : "Buffer",
+					data : Buffer(ex: [123,0,1,0,0,...])
+			}
+			
+		]
+ *	}
+ */
+exports.getProfileImg =(req,res) => {
+	const getData = () => {
+		if(!req.query.username) {
+			return User.findOne({_id: res.locals._id},{_id:1}).exec()
+		} else {
+			return User.findOne({username: req.query.username},{_id:1}).exec()
+		}
+	}
+	const getImg = (user) => {
+		return Profile.findOne({uid: user._id},{img:1,_id:0}).exec()
+	}
+	const send = (dt) => {
+		return res.status(200).json({
+			img: dt.img
+		})
 	}
 }
 
@@ -587,3 +675,5 @@ exports.deleteUser = (req, res) => {
 		return res.status(500).json({ error: err.message })
 	}
 }
+
+

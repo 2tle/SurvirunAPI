@@ -3,7 +3,7 @@ const controller = require('./auth.controller.js')
 const authMiddleware = require('../../../../middlewares/authorization.js')
 const logMiddleware = require('../../../../middlewares/log.js')
 const multer = require('multer')
-const upload = multer({dest: 'images/',limits: { fileSize: 5 * 1024 * 1024 }})
+const upload = multer({storage: multer.memoryStorage(),limits: { fileSize: 5 * 1024 * 1024 }})
 
 
 
@@ -14,10 +14,12 @@ router.get('/by-username/:username', logMiddleware.consoleLog ,authMiddleware.ve
 router.get('/by-email/:email', logMiddleware.consoleLog ,authMiddleware.verifyToken ,controller.getUserByEmail)
 router.post('/new', logMiddleware.consoleLog ,controller.createNewUser)
 router.post('/local', logMiddleware.consoleLog ,controller.createToken)
-router.post('/profile',logMiddleware.consoleLog ,authMiddleware.verifyToken,upload.single('img'),controller.uploadProfileImage)
+router.post('/profile',logMiddleware.consoleLog ,authMiddleware.verifyToken,upload.single('image'),controller.uploadProfileImage)
+router.get('/profile',logMiddleware.consoleLog, authMiddleware.verifyToken, controller.getProfileImg)
 router.patch('/password', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.updatePassword)
 router.patch('/by-username/:username', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.updateUsername)
 router.delete('/local',logMiddleware.consoleLog, authMiddleware.verifyToken, controller.deleteUser)
+
 
 
 module.exports = router

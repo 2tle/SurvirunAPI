@@ -35,32 +35,19 @@ exports.getFriendsList = (req,res) => {
 		return Friend.findOne({uid: res.locals._id}).exec()
 	}
 	
-	const getUserList = async (listdata) => {
-		//const t = Object.values(listdata.friends.filter)
-		//console.log(listdata)
-
-		//var list = []
-		
-		for(const [index,value] of listdata.friends.entries()) {
-			const g = await User.findOne({_id:value.uid})
-			list.push({"username":g.username})
-		} 
-		return res.status(200).json({
-			friends: list
-		})
-		/*
-		return User.find({_id: {'$in' : listdata.friends}},{_id:0,__v:0,email:0,password:0}).exec() */
+	const getUserList = (listdata) => {
+		return User.find({_id: {'$in' : listdata.friends}},{_id:0,__v:0,email:0,password:0}).exec()
 		
 		
 		
-	} /*
+	}
 	const send = (listArr) => {
 		return res.status(200).json({
 			friends: listArr
 		})
-	} */
+	}
 	try {
-		getList().then(getUserList)//.then(send)
+		getList().then(getUserList).then(send)
 	} catch(err) {
 		//console.error(err)
 		return res.status(500).json({error: err.message})
@@ -94,9 +81,8 @@ exports.addFriend = (req,res) => {
 			uid: res.locals._id
 		},{
 			'$addToSet': {
-				friends: {
-					uid: another._id
-				}
+				friends:another._id
+				
 			}
 		})
 	} 
@@ -105,9 +91,7 @@ exports.addFriend = (req,res) => {
 			uid: another._id
 		},{
 			'$addToSet': {
-				friends: {
-					uid: res.locals._id
-				}
+				friends: res.locals._id
 			}
 		})
 	}
@@ -125,7 +109,7 @@ exports.addFriend = (req,res) => {
 	}
 }
 /**
- * @api {delete} /api/v1/friend Request to remove user's friend
+ * @api {patch} /api/v1/friend Request to remove user's friend
  * @apiName RemoveFriendList
  * @apiGroup Friend
  * @apiHeader {String} x-access-token user's jwt token
@@ -152,9 +136,8 @@ exports.removeFriend = (req, res) => {
 			uid: res.locals._id
 		},{
 			'$pull': {
-				friends: {
-					uid: another._id
-				}
+				friends: another._id
+				
 			}
 		})
 	} 
@@ -163,9 +146,7 @@ exports.removeFriend = (req, res) => {
 			uid: another._id
 		},{
 			'$pull': {
-				friends: {
-					uid: res.locals._id
-				}
+				friends: res.locals._id
 			}
 		})
 	}

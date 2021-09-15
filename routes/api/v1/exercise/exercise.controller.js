@@ -43,7 +43,6 @@ const upload = {
 exports.getExerciseData = (req, res) => { //today
 	const currentTimeToStr = moment().tz("Asia/Seoul").format("YYYY-MM-DD")
 	const getData = () => {
-
 		return Exercise.findOne({ uid: res.locals._id, date: currentTimeToStr },{_id:0,uid:0,__v:0})
 	}
 	const send = (data) => {
@@ -318,4 +317,6 @@ exports.getImages = (req,res) => {
 		return res.status(500).json({error: e.message})
 	}
 }
+
+
 
