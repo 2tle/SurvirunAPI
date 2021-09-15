@@ -35,21 +35,32 @@ exports.getFriendsList = (req,res) => {
 		return Friend.findOne({uid: res.locals._id}).exec()
 	}
 	
-	const send = async (listdata) => {
-		var list = []
+	const getUserList = async (listdata) => {
+		//const t = Object.values(listdata.friends.filter)
+		//console.log(listdata)
+
+		//var list = []
 		
 		for(const [index,value] of listdata.friends.entries()) {
 			const g = await User.findOne({_id:value.uid})
 			list.push({"username":g.username})
-		}
+		} 
 		return res.status(200).json({
-			"friends":list
+			friends: list
 		})
+		/*
+		return User.find({_id: {'$in' : listdata.friends}},{_id:0,__v:0,email:0,password:0}).exec() */
 		
 		
-	}
+		
+	} /*
+	const send = (listArr) => {
+		return res.status(200).json({
+			friends: listArr
+		})
+	} */
 	try {
-		getList().then(send)
+		getList().then(getUserList)//.then(send)
 	} catch(err) {
 		//console.error(err)
 		return res.status(500).json({error: err.message})

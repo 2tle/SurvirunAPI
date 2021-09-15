@@ -1,10 +1,11 @@
-[
+define({ "api": [
   {
     "type": "post",
     "url": "/api/v1/auth/new",
     "title": "Request to create new user",
     "name": "CreateNewUser",
     "group": "Auth",
+    "version": "1.0.0",
     "body": [
       {
         "group": "Body",
@@ -62,7 +63,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/auth/auth.controller.js",
     "groupTitle": "Auth"
   },
@@ -72,6 +72,7 @@
     "title": "Request to decode jwt token",
     "name": "DecodeJwtToken",
     "group": "Auth",
+    "version": "1.0.0",
     "header": {
       "fields": {
         "Header": [
@@ -156,7 +157,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/auth/auth.controller.js",
     "groupTitle": "Auth"
   },
@@ -166,6 +166,7 @@
     "title": "Request to delete user",
     "name": "DeletePassword",
     "group": "Auth",
+    "version": "1.0.0",
     "header": {
       "fields": {
         "Header": [
@@ -217,7 +218,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/auth/auth.controller.js",
     "groupTitle": "Auth"
   },
@@ -227,6 +227,7 @@
     "title": "Request to login",
     "name": "Login",
     "group": "Auth",
+    "version": "1.0.0",
     "body": [
       {
         "group": "Body",
@@ -277,7 +278,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/auth/auth.controller.js",
     "groupTitle": "Auth"
   },
@@ -287,6 +287,7 @@
     "title": "Request to update password",
     "name": "UpdatePassword",
     "group": "Auth",
+    "version": "1.0.0",
     "header": {
       "fields": {
         "Header": [
@@ -338,7 +339,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/auth/auth.controller.js",
     "groupTitle": "Auth"
   },
@@ -348,6 +348,7 @@
     "title": "Request to update username",
     "name": "UpdateUsername",
     "group": "Auth",
+    "version": "1.0.0",
     "header": {
       "fields": {
         "Header": [
@@ -403,16 +404,82 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/auth/auth.controller.js",
     "groupTitle": "Auth"
   },
   {
     "type": "get",
-    "url": "/api/v1/exercise",
-    "title": "Request to get today exercise data",
-    "name": "GetTodayExercise",
+    "url": "/api/v1/exercise/img",
+    "title": "Request to get exercise images",
+    "name": "GetExerciseImages",
     "group": "Exercise",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "query": [
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "date",
+        "description": "<p>(Optional) YYYY-MM-DD</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "List",
+            "optional": false,
+            "field": "exerciseImages",
+            "description": "<p>List Image</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"exerciseImages\" : [\n\t\t{\n\t\t\t\"date\" : \"2021-09-16\",\n\t\t\t\"time\" : \"22:01:13\",\n\t\t\t\"img\" : {\n\t\t\t\ttype : \"Buffer\",\n\t\t\t\tdata : Buffer(ex: [123,0,1,0,0,...])\n\t\t\t}\n\t\t},\n\t\t...\n\t]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Something Error:",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/exercise/exercise.controller.js",
+    "groupTitle": "Exercise"
+  },
+  {
+    "type": "get",
+    "url": "/api/v1/exercise/list",
+    "title": "Request to get exercise data before 7days",
+    "name": "GetExerciseList",
+    "group": "Exercise",
+    "version": "1.0.0",
     "header": {
       "fields": {
         "Header": [
@@ -431,10 +498,88 @@
         "Success 200": [
           {
             "group": "Success 200",
-            "type": "Exercise",
+            "type": "List",
             "optional": false,
             "field": "exerciseHistory",
             "description": "<p>user's today exercise</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"exerciseHistory\": [\n\t\t{\n\t\t\t\"calorie\":10\n\t\t\t\"km\":0.045,\n\t\t\t\"time\": 4312,\n\t\t\t\"date\":\"2021-09-13\"\t\n\t\t},\n\t\t{\n\t\t\t\"calorie\":10\n\t\t\t\"km\":0.045,\n\t\t\t\"time\": 4312,\n\t\t\t\"date\":\"2021-09-12\"\t\n\t\t},\n\t\t...\n\t]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Not Found email:",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/exercise/exercise.controller.js",
+    "groupTitle": "Exercise"
+  },
+  {
+    "type": "get",
+    "url": "/api/v1/exercise",
+    "title": "Request to get today exercise data",
+    "name": "GetTodayExercise",
+    "group": "Exercise",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "date",
+            "description": "<p>user's today exercise</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "calorie",
+            "description": "<p>user's today exercise: calorie</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km",
+            "description": "<p>user's today exercise: running km</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "time",
+            "description": "<p>user's today exercise: time (second)</p>"
           }
         ]
       },
@@ -460,7 +605,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/exercise/exercise.controller.js",
     "groupTitle": "Exercise"
   },
@@ -547,6 +691,7 @@
         }
       ]
     },
+    "version": "1.0.0",
     "error": {
       "examples": [
         {
@@ -561,7 +706,73 @@
         }
       ]
     },
-    "version": "0.0.0",
+    "filename": "routes/api/v1/exercise/exercise.controller.js",
+    "groupTitle": "Exercise"
+  },
+  {
+    "type": "post",
+    "url": "/api/v1/exercise/img",
+    "title": "Request to upload exercise image",
+    "name": "UploadExerciseImage",
+    "description": "<p>Must USE Header :: Content-Type :  multipart/form-data</p>",
+    "group": "Exercise",
+    "version": "1.0.0",
+    "body": [
+      {
+        "group": "Body",
+        "type": "Image",
+        "optional": false,
+        "field": "img",
+        "description": "<p>Image File</p>"
+      }
+    ],
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>true</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"result\" : true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Something Error:",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
     "filename": "routes/api/v1/exercise/exercise.controller.js",
     "groupTitle": "Exercise"
   },
@@ -593,6 +804,7 @@
         "description": "<p>friend's username</p>"
       }
     ],
+    "version": "1.0.0",
     "success": {
       "fields": {
         "Success 200": [
@@ -622,7 +834,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/friend/friend.controller.js",
     "groupTitle": "Friend"
   },
@@ -632,6 +843,7 @@
     "title": "Request to get user's friend list",
     "name": "GetFriendList",
     "group": "Friend",
+    "version": "1.0.0",
     "header": {
       "fields": {
         "Header": [
@@ -674,7 +886,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/friend/friend.controller.js",
     "groupTitle": "Friend"
   },
@@ -726,6 +937,7 @@
         }
       ]
     },
+    "version": "1.0.0",
     "error": {
       "examples": [
         {
@@ -735,7 +947,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/friend/friend.controller.js",
     "groupTitle": "Friend"
   },
@@ -745,6 +956,7 @@
     "title": "Request to check who has email",
     "name": "CheckUserWhohasEmail",
     "group": "User",
+    "version": "1.0.0",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -783,7 +995,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/auth/auth.controller.js",
     "groupTitle": "User"
   },
@@ -793,6 +1004,7 @@
     "title": "Request to check who has username",
     "name": "CheckUserWhohasUsername",
     "group": "User",
+    "version": "1.0.0",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -831,7 +1043,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/auth/auth.controller.js",
     "groupTitle": "User"
   },
@@ -841,6 +1052,7 @@
     "title": "Request to get user by email",
     "name": "GetUserByEmail",
     "group": "User",
+    "version": "1.0.0",
     "header": {
       "fields": {
         "Header": [
@@ -901,7 +1113,6 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/auth/auth.controller.js",
     "groupTitle": "User"
   },
@@ -911,6 +1122,7 @@
     "title": "Request to get user by username",
     "name": "GetUserByUsername",
     "group": "User",
+    "version": "1.0.0",
     "header": {
       "fields": {
         "Header": [
@@ -971,8 +1183,7 @@
         }
       ]
     },
-    "version": "0.0.0",
     "filename": "routes/api/v1/auth/auth.controller.js",
     "groupTitle": "User"
   }
-]
+] });

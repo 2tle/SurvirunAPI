@@ -3,7 +3,7 @@ const Exercise = require('../../../../models/Exercise')
 const Friend = require('../../../../models/Friend')
 const config = require('../../../../config.js')
 const path = require('path')
-
+const moment = require('moment-timezone')
 const jwt = require('jsonwebtoken')
 
 const multer = require('multer')
@@ -130,6 +130,10 @@ exports.emailExists = (req, res) => {
  */
 exports.getUserByUsername = (req, res) => {
 
+	var id1 =''
+	var email1 =''
+	var username1 = ''
+
 
 	const getUser = (username) => {
 		return User.find({ username: username }).exec()
@@ -141,21 +145,29 @@ exports.getUserByUsername = (req, res) => {
 	}
 
 	const dataProcess = (user) => {
-		const exd = Exercise.find({ uid: user[0]._id }).sort({ "date": -1 }).limit(7)
-		const userJson = {
-			"_id": user[0]._id,
-			"email": user[0].email,
-			"username": user[0].username,
-			"exerciseHistory": exd
-		}
+		id1 = user[0]._id
+		email1 = user[0].email
+		username1 = user[0].username
+		return Exercise.find({ uid: user[0]._id },{_id:0, uid: 0,__v:0}).sort({ "date": -1 }).limit(7).exec()
+		
+	}
+	
 
+	const send = (d) => {
+		const userJson = {
+			"_id": id1,
+			"email": email1,
+			"username": username1,
+			"exerciseHistory": d
+		}
 		return res.status(200).json(userJson)
 	}
 
 	try {
-		const username = req.params.username
-		if (!username) return res.status(400).json({ error: "username must not be null" })
-		getUser(username).then(check).then(dataProcess)
+		const username = decodeURI(req.params.username)
+		
+		if (!username) return res.status(400).json({ error: "email must not be null" })
+		getUser(username).then(check).then(dataProcess).then(send)
 	} catch (err) {
 		console.error(err.message)
 		return res.status(500).json({ error: err.message })
@@ -207,6 +219,9 @@ exports.getUserByUsername = (req, res) => {
  * 	}
  */
 exports.getUserByEmail = (req, res) => {
+	var id1 =''
+	var email1 =''
+	var username1 = ''
 
 
 	const getUser = (email) => {
@@ -219,21 +234,29 @@ exports.getUserByEmail = (req, res) => {
 	}
 
 	const dataProcess = (user) => {
-		const exd = Exercise.find({ uid: user[0]._id }).sort({ "date": -1 }).limit(7)
-		const userJson = {
-			"_id": user[0]._id,
-			"email": user[0].email,
-			"username": user[0].username,
-			"exerciseHistory": exd
-		}
+		id1 = user[0]._id
+		email1 = user[0].email
+		username1 = user[0].username
+		return Exercise.find({ uid: user[0]._id },{_id:0, uid: 0,__v:0}).sort({ "date": -1 }).limit(7).exec()
+		
+	}
+	
 
+	const send = (d) => {
+		const userJson = {
+			"_id": id1,
+			"email": email1,
+			"username": username1,
+			"exerciseHistory": d
+		}
 		return res.status(200).json(userJson)
 	}
 
 	try {
-		const email = req.params.email
+		const email = decodeURI(req.params.email)
+		
 		if (!email) return res.status(400).json({ error: "email must not be null" })
-		getUser(email).then(check).then(dataProcess)
+		getUser(email).then(check).then(dataProcess).then(send)
 	} catch (err) {
 		console.error(err.message)
 		return res.status(500).json({ error: err.message })
@@ -275,8 +298,7 @@ exports.createNewUser = (req, res) => {
 
 	const createUser = (email, username, password) => {
 		const newUser = new User({ email: email, username: username, password: password })
-		const currentTime = new Date()
-		const currentTimeToStr = currentTime.getFullYear() + '-' + (currentTime.getMonth() + 1) + '-' + currentTime.getDate();
+		const currentTimeToStr = moment().tz("Asia/Seoul").format("YYYY-MM-DD")
 		const exercise = new Exercise({ uid: newUser._id, calorie: 0, km: 0, time: 0, date: currentTimeToStr })
 		const friend = new Friend({ uid: newUser._id, friends: [] })
 		const ee = friend.save()
@@ -543,7 +565,7 @@ exports.deleteUser = (req, res) => {
 		return Friend.deleteMany({ uid: res.locals._id }).exec()
 	}
 	const delFriendOthers = (t) => {
-		return Friend.update({}, {
+		return Friend.updateMany({}, {
 			'$pull': {
 				friends: {
 					uid: res.locals._id

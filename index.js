@@ -1,10 +1,27 @@
-const express = require('express');
-const app = express();
-const config = require('./config.js');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+const express = require('express')
+const app = express()
+const config = require('./config.js')
+const mongoose = require('mongoose')
+const bodyParser = require('body-parser')
 const logMiddleware = require('./middlewares/log')
-const url = require('url');
+const url = require('url')
+const timeout = require('express-timeout-handler')
+const moment = require('moment-timezone')
+const httpError = require('./middlewares/httpError')
+
+
+
+var opt = {
+	timeout: 10000,
+	onTimeout:(req, res) => {
+	console.log('[TimeOut]')
+    res.status(503).json({error: 'Timeout'});
+  },
+  onDelayedResponse: (req, method, args, requestTime) => {
+    console.log(`Attempted to call ${method} after timeout`);
+  },
+  disable: ['write', 'setHeaders', 'send', 'json', 'end']
+}
 
 mongoose.Promise = global.Promise;
 mongoose.set('useNewUrlParser', true);
@@ -20,13 +37,16 @@ mongoose
 	.catch(e => {
 		console.error(e);
 	});
-
+app.use(timeout.handler(opt))
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 app.set('views', __dirname + '/apiDoc');
 app.use(express.static('public'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({
+	limit : "50mb"
+}));
+app.use(bodyParser.urlencoded({ limit : "50mb",extended: true }));
+
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
@@ -37,16 +57,20 @@ app.use((req, res, next) => {
 app.set('jwt-secret', config.secret);
 
 app.get('/',logMiddleware.consoleLog , (req, res) => {
-	res.status(200).json({ status: 200, baseUrl: req.hostname });
+	const d = {
+		status: 200
+	}
+	res.status(200).json(d);
 });
-
-//app.get('/DOCUMENT',  express.static(__dirname + '/apiDoc'));
 
 
 app.use('/api', require('./routes/api'));
 
 
-app.listen(config.port || 3000, () => {
+
+app.use(httpError.pageNotFoundError)
+app.use(httpError.respondInternalError)
+const server = app.listen(config.port || 3000, () => {
 	console.log('server is now running');
 });
 
