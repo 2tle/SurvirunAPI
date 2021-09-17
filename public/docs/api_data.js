@@ -720,9 +720,9 @@ define({ "api": [
     "body": [
       {
         "group": "Body",
-        "type": "Image",
+        "type": "File",
         "optional": false,
-        "field": "img",
+        "field": "image",
         "description": "<p>Image File</p>"
       }
     ],
@@ -1263,9 +1263,9 @@ define({ "api": [
     "body": [
       {
         "group": "Body",
-        "type": "Image",
+        "type": "File",
         "optional": false,
-        "field": "img",
+        "field": "image",
         "description": "<p>Image File</p>"
       }
     ],

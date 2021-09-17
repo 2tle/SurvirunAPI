@@ -411,7 +411,7 @@ exports.createToken = (req, res) => {
  * @apiDescription Must USE Header :: Content-Type :  multipart/form-data
  * @apiGroup User
  * @apiVersion 1.0.0
- * @apiBody {Image} img Image File
+ * @apiBody {File} image Image File
  * @apiHeader {String} x-access-token user's jwt token
  * @apiSuccess {Boolean} result true
  * @apiErrorExample {json} Something Error:
@@ -458,7 +458,7 @@ exports.uploadProfileImage = (req, res) => {
 
 	try {
 		//console.log(body)
-		if (req.file.buffer == "") {
+		if (!req.file.buffer) {
 			return res.status(400).json({ error: "Data must not be null" })
 		}
 		findOne().then(uploadImg).then(send)

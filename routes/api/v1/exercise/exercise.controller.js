@@ -8,7 +8,7 @@ const crypto = require('crypto')
 const moment = require('moment-timezone')
 const multer = require('multer')
 const upload = {
-	limits: {fileSize: 5*1024*1024}
+	limits: {fileSize: 15*1024*1024}
 }
 
 /**
@@ -205,7 +205,7 @@ exports.getExerList = (req,res) => {
  * @apiDescription Must USE Header :: Content-Type :  multipart/form-data
  * @apiGroup Exercise
  * @apiVersion 1.0.0
- * @apiBody {Image} img Image File
+ * @apiBody {File} image Image File
  * @apiHeader {String} x-access-token user's jwt token
  * @apiSuccess {Boolean} result true
  * @apiErrorExample {json} Something Error:

@@ -11,7 +11,8 @@ const httpError = require('./middlewares/httpError')
 
 
 
-var opt = {
+
+const opt = {
 	timeout: 10000,
 	onTimeout:(req, res) => {
 	console.log('[TimeOut]')
@@ -65,7 +66,6 @@ app.get('/',logMiddleware.consoleLog , (req, res) => {
 
 
 app.use('/api', require('./routes/api'));
-
 
 
 app.use(httpError.pageNotFoundError)
