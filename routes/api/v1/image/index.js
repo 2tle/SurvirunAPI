@@ -1,0 +1,10 @@
+const router = require('express').Router()
+const controller = require('./image.controller.js')
+const authMiddleware = require('../../../../middlewares/authorization.js')
+const logMiddleware = require('../../../../middlewares/log.js')
+const multer = require('multer')
+const upload = multer({dest: 'images/',limits: { fileSize: 5 * 1024 * 1024 }})
+
+router.get('/',logMiddleware.consoleLog, controller.sendImg)
+
+module.exports = router

@@ -15,6 +15,7 @@
     "amdefine": "^1.0.1",
     "apidoc": "^0.29.0",
     "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
     "config.js": "^0.1.0",
     "crypto": "^1.0.1",
     "data-utils": "0.0.2",
@@ -33,6 +34,7 @@
     "nodemon": "^2.0.7",
     "path": "^0.12.7",
     "pm2": "^5.1.1",
+    "sharp": "^0.29.1",
     "url": "^0.11.0"
   },
   "apidoc": {

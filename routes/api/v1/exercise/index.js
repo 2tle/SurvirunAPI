@@ -5,7 +5,7 @@ const logMiddleware = require('../../../../middlewares/log.js')
 const multer = require('multer')
 const upload = multer({
 	storage: multer.memoryStorage(),
-	limits: {fileSize: 5*1024*1024}
+	limits: {fileSize: 1*1024*1024}
 })
 
 router.get('/',logMiddleware.consoleLog ,authMiddleware.verifyToken, controller.getExerciseData)

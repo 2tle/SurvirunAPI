@@ -8,6 +8,8 @@ const url = require('url')
 const timeout = require('express-timeout-handler')
 const moment = require('moment-timezone')
 const httpError = require('./middlewares/httpError')
+const compression = require('compression');
+
 
 
 
@@ -39,6 +41,7 @@ mongoose
 		console.error(e);
 	});
 app.use(timeout.handler(opt))
+app.use(compression())
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 app.set('views', __dirname + '/apiDoc');

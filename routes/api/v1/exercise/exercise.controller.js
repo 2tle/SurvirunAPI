@@ -279,7 +279,7 @@ exports.uploadMyExPhoto = (req ,res) => {
  *	{
  *		"error": "Token Expired"
  * 	}
- * @apiSuccessExample {json} Success:
+ * @apiSuccessExample {json} Success - buffer:
  *	HTTP/1.1 200 OK
  *	{
 		"exerciseImages" : [
@@ -294,17 +294,35 @@ exports.uploadMyExPhoto = (req ,res) => {
 			...
 		]
  *	}
+	@apiSuccessExample {json} Success - url:
+ *	HTTP/1.1 200 OK
+ *	{
+		"exerciseImages" : [
+			{
+				"date" : "2021-09-16",
+				"time" : "22:01:13",
+				"_id" : "uuid" 
+			},
+			...
+		]
+ *	}
  */
 exports.getImages = (req,res) => {
 	const getData = () => {
 		if(req.query.date != "") {
-			return ExerciseImage.find({uid: res.locals._id, date: req.query.date },{_id:0,uid:0,__v:0}).exec()
+			if(req.query.resType == "url")
+				return ExerciseImage.find({uid: res.locals._id, date: req.query.date },{_id:1,uid:0,__v:0,img:0}).exec()
+			else return ExerciseImage.find({uid: res.locals._id, date: req.query.date },{_id:0,uid:0,__v:0,img:1}).exec()
 		}	
 		else {
-			return ExerciseImage.find({uid: res.locals._id },{_id:0,uid:0,__v:0}).exec()
+			if(req.query.resType == "url")
+				return ExerciseImage.find({uid: res.locals._id },{_id:1,uid:0,__v:0,img:0}).exec()
+			else return ExerciseImage.find({uid: res.locals._id },{_id:0,uid:0,__v:0,img:1}).exec()
 		}
-	}
+	}	
+
 	const send = (data) => {
+
 		return res.status(200).json({
 			exerciseImages : data
 		})

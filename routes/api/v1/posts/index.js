@@ -3,6 +3,7 @@ const controller = require('./posts.controller.js')
 const authMiddleware = require('../../../../middlewares/authorization.js')
 const logMiddleware = require('../../../../middlewares/log.js')
 
+/*
 router.get('/', logMiddleware.consoleLog ,authMiddleware.verifyToken, controller.getPost)
 router.post('/', logMiddleware.consoleLog ,authMiddleware.verifyToken, controller.createPost)
 router.delete('/:id',logMiddleware.consoleLog ,authMiddleware.verifyToken, controller.deletePost)
@@ -13,6 +14,6 @@ router.delete('/likes/:id', logMiddleware.consoleLog ,authMiddleware.verifyToken
 router.get('/comment/:id',logMiddleware.consoleLog,authMiddleware.verifyToken, controller.getComment)
 //router.post('/comment/:id', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.addComment)
 
-
+*/
 
 module.exports = router

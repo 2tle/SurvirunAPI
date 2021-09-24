@@ -253,13 +253,27 @@ define({ "api": [
             "optional": false,
             "field": "token",
             "description": "<p>user's jwt token</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "username",
+            "description": "<p>if user set its username T/F</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "profile",
+            "description": "<p>if user set its profile img T/F</p>"
           }
         ]
       },
       "examples": [
         {
           "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"token\":\"eyJwe...\"\n}",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"token\":\"eyJwe...\",\n\t\"username\" : true,\n\t\"profile\" : false\n}",
           "type": "json"
         }
       ]
@@ -795,13 +809,29 @@ define({ "api": [
         ]
       }
     },
+    "query": [
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "reqType",
+        "description": "<p>email or username</p>"
+      }
+    ],
     "body": [
       {
         "group": "Body",
         "type": "String",
         "optional": false,
         "field": "username",
-        "description": "<p>friend's username</p>"
+        "description": "<p>if you want to add friend as friend's username</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "email",
+        "description": "<p>if you want to add friend as friend's email</p>"
       }
     ],
     "version": "1.0.0",
@@ -857,6 +887,15 @@ define({ "api": [
         ]
       }
     },
+    "query": [
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "resType",
+        "description": "<p>responseType: email or username, default is email</p>"
+      }
+    ],
     "success": {
       "fields": {
         "Success 200": [
@@ -871,8 +910,13 @@ define({ "api": [
       },
       "examples": [
         {
-          "title": "Success:",
+          "title": "Success, resType is username:",
           "content": "HTTP/1.1 200 OK\n{\n\t\"friends\": [\n\t\t{username: \"Lux\"},\n\t\t{username: \"Ashe\"},\n\t\t...\n\t]\n}",
+          "type": "json"
+        },
+        {
+          "title": "Success, resType is email:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"friends\": [\n\t\t{email: \"java@isnotgood.com\"},\n\t\t{email: \"kotlin@isbest.io\"},\n\t\t...\n\t]\n}",
           "type": "json"
         }
       ]
@@ -908,13 +952,29 @@ define({ "api": [
         ]
       }
     },
+    "query": [
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "reqType",
+        "description": "<p>email or username</p>"
+      }
+    ],
     "body": [
       {
         "group": "Body",
         "type": "String",
         "optional": false,
         "field": "username",
-        "description": "<p>friend's username</p>"
+        "description": "<p>if you want to add friend as friend's username</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "email",
+        "description": "<p>if you want to add friend as friend's email</p>"
       }
     ],
     "success": {
@@ -1071,7 +1131,21 @@ define({ "api": [
         "group": "Query",
         "type": "String",
         "optional": false,
+        "field": "reqType",
+        "description": "<p>email or username or self</p>"
+      },
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
         "field": "username",
+        "description": "<p>(Optional) if you want to other user's image, input it.</p>"
+      },
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "email",
         "description": "<p>(Optional) if you want to other user's image, input it.</p>"
       }
     ],

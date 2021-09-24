@@ -2,6 +2,8 @@ const User = require('../../../../models/user')
 const Exercise = require('../../../../models/Exercise')
 const Friend = require('../../../../models/Friend')
 const Profile = require('../../../../models/Profile')
+const CheckModule = require('../../../../module/check.js')
+const sharp = require("sharp");
 const config = require('../../../../config.js')
 const path = require('path')
 const moment = require('moment-timezone')
@@ -39,6 +41,7 @@ exports.usernameExists = (req, res) => {
 		if (!user.length) return res.status(200).json({ exists: false })
 		else return res.status(200).json({ exists: true })
 	}
+
 
 	try {
 		const username = req.params.username
@@ -345,6 +348,8 @@ exports.createNewUser = (req, res) => {
  * @apiBody {String} email
  * @apiBody {String} password 
  * @apiSuccess {String} token user's jwt token
+ * @apiSuccess {Boolean} username if user set its username T/F
+ * @apiSuccess {Boolean} profile if user set its profile img T/F
  * @apiErrorExample {json} Not Found email:
  *	HTTP/1.1 400 Bad Request
  *	{ 
@@ -353,7 +358,9 @@ exports.createNewUser = (req, res) => {
  * @apiSuccessExample {json} Success:
  *	HTTP/1.1 200 OK
  *	{
- *		"token":"eyJwe..."
+ *		"token":"eyJwe...",
+ * 		"username" : true,
+ * 		"profile" : false
  *	}
  * @apiErrorExample {json} Token Expired:
  *	HTTP/1.1 419
@@ -363,7 +370,10 @@ exports.createNewUser = (req, res) => {
  */
 
 exports.createToken = (req, res) => {
-
+	let isUserNameCreated;
+	let isProfileImgUploaded;
+	let token;
+	let userId;
 	const getUser = (email, password) => {
 		return User.findOne({ email: email, password: password }).exec()
 	}
@@ -371,7 +381,7 @@ exports.createToken = (req, res) => {
 
 	const createToken = (user) => {
 		if (user != null) {
-			const token = jwt.sign({
+			token = jwt.sign({
 				_id: user._id,
 				email: user.email,
 				username: user.username
@@ -380,9 +390,15 @@ exports.createToken = (req, res) => {
 					subject: "userinfo",
 					issuer: config.hostname
 				})
+			userId = user._id;
+			isUserNameCreated = !CheckModule.isEmpty(user.username)
+			return Profile.findOne({ uid: userId })
+
+			//return 
+			/*
 			res.status(200).json({
 				token: token
-			})
+			})*/
 		} else {
 			res.status(404).json({
 				error: "Not Found User"
@@ -391,13 +407,21 @@ exports.createToken = (req, res) => {
 
 	}
 
+	const pimgc = (pd) => {
+		isProfileImgUploaded = !CheckModule.isEmpty(pd)
+		return res.status(200).json({
+			token: token,
+			username: isUserNameCreated,
+			profile: isProfileImgUploaded
+		})
+	}
 	try {
 		if (req.body.email == "" || req.body.password == "") {
 			return res.status(400).json({ error: "Data must not be null" })
 		}
 		const email = req.body.email;
 		const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
-		getUser(email, password).then(createToken)
+		getUser(email, password).then(createToken).then(pimgc)
 	} catch (err) {
 		console.error(err.message)
 		return res.status(500).json({ error: err.message })
@@ -431,11 +455,23 @@ exports.createToken = (req, res) => {
  *	}
  */
 exports.uploadProfileImage = (req, res) => {
+
+	let imgbuffer;
+
+	const zip1 = () => {
+		return sharp(req.file.buffer)  // 압축할 이미지 경로
+			.resize({ width: 500 }) // 비율을 유지하며 가로 크기 줄이기
+			.withMetadata()	// 이미지의 exif데이터 유지
+			.toBuffer().then((data) => {
+				imgbuffer = data;
+			})
+	}
 	const findOne = () => {
 		return Profile.findOne({ uid: res.locals._id }).exec()
 	}
+
 	const uploadImg = (findOne) => {
-		const imgbuffer = req.file.buffer;
+		//const imgbuffer = req.file.buffer;
 		if (imgbuffer.truncated) {
 			return res.status(413).json({ error: "Payload Too Large" })
 		}
@@ -446,7 +482,7 @@ exports.uploadProfileImage = (req, res) => {
 			})
 			return img.save()
 		} else {
-			return Profile.update({ uid: res.locals._id }, { img: imgbuffer }).exec()
+			return Profile.updateOne({ uid: res.locals._id }, { img: imgbuffer }).exec()
 		}
 
 
@@ -457,10 +493,11 @@ exports.uploadProfileImage = (req, res) => {
 	}
 
 	try {
-		//console.log(body)
+
 		if (!req.file.buffer) {
 			return res.status(400).json({ error: "Data must not be null" })
 		}
+		zip1();
 		findOne().then(uploadImg).then(send)
 	} catch (e) {
 		console.error(e)
@@ -474,7 +511,9 @@ exports.uploadProfileImage = (req, res) => {
  * @apiGroup User
  * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
+ * @apiQuery {String} reqType email or username or self
  * @apiQuery {String} username (Optional) if you want to other user's image, input it.
+ * @apiQuery {String} email (Optional) if you want to other user's image, input it.
  * @apiSuccess {Object} img ImageBuffer..
  * @apiErrorExample {json} Something Error:
  *	HTTP/1.1 500 Internal Server Error
@@ -486,7 +525,7 @@ exports.uploadProfileImage = (req, res) => {
  *	{
  *		"error": "Token Expired"
  * 	}
- * @apiSuccessExample {json} Success:
+ * @apiSuccessExample {json} Success - buffer:
  *	HTTP/1.1 200 OK
  *	{
 		"img" : {
@@ -496,21 +535,57 @@ exports.uploadProfileImage = (req, res) => {
 			
 		]
  *	}
+ *  @apiSuccessExample {json} Success - url:
+ *	HTTP/1.1 200 OK
+ *	{
+		"exerciseImages" : [
+			{
+				"date" : "2021-09-16",
+				"time" : "22:01:13",
+				"_id" : "uuid" 
+			},
+			...
+		]
+ *	}
  */
-exports.getProfileImg =(req,res) => {
+exports.getProfileImg = (req, res) => {
 	const getData = () => {
-		if(!req.query.username) {
-			return User.findOne({_id: res.locals._id},{_id:1}).exec()
-		} else {
-			return User.findOne({username: req.query.username},{_id:1}).exec()
+		switch (req.query.reqType) {
+			case "username":
+				if (CheckModule.isEmpty(req.query.username)) return res.status(400).json({ error: "data must not be null" })
+				else return User.findOne({ username: req.query.username }, { _id: 1 }).exec()
+				break;
+			case "email":
+				if (CheckModule.isEmpty(req.query.email)) return res.status(400).json({ error: "data must not be null" })
+				else return User.findOne({ email: req.query.email }, { _id: 1 }).exec()
+				break;
+			default:
+				return User.findOne({ _id: res.locals._id }, { _id: 1 }).exec()
+				break;
 		}
 	}
 	const getImg = (user) => {
-		return Profile.findOne({uid: user._id},{img:1,_id:0}).exec()
+		return Profile.findOne({ uid: user._id }, { img: 1, _id: 0 }).exec()
 	}
 	const send = (dt) => {
-		return res.status(200).json({
-			img: dt.img
+		if (CheckModule.isEmpty(dt)) {
+			return res.status(400).json({
+				error: "did not set profile yet"
+			})
+		} else {
+			return res.status(200).json({
+				img: dt.img
+			})
+		}
+
+	}
+
+	try {
+		getData().then(getImg).then(send)
+	} catch (e) {
+		console.error(e)
+		return res.status(500).json({
+			error: e.message
 		})
 	}
 }

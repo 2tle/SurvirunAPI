@@ -3,7 +3,7 @@ const controller = require('./auth.controller.js')
 const authMiddleware = require('../../../../middlewares/authorization.js')
 const logMiddleware = require('../../../../middlewares/log.js')
 const multer = require('multer')
-const upload = multer({storage: multer.memoryStorage(),limits: { fileSize: 15 * 1024 * 1024 }})
+const upload = multer({storage: multer.memoryStorage(),limits: { fileSize: 1 * 1024 * 1024 }})
 
 
 
