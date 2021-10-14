@@ -137,6 +137,7 @@ exports.getUserByUsername = (req, res) => {
 	var id1 = ''
 	var email1 = ''
 	var username1 = ''
+	let imguid = ""
 
 
 	const getUser = (username) => {
@@ -164,7 +165,7 @@ exports.getUserByUsername = (req, res) => {
 			"username": username1,
 			"exerciseHistory": d
 		}
-		return res.status(200).json(userJson)
+		return res.status(200).json({user: userJson})
 	}
 
 	try {
@@ -223,10 +224,10 @@ exports.getUserByUsername = (req, res) => {
  * 	}
  */
 exports.getUserByEmail = (req, res) => {
-	var id1 = ''
-	var email1 = ''
-	var username1 = ''
-
+	let id1 = ''
+	let email1 = ''
+	let username1 = ''
+	let imguid = ""
 
 	const getUser = (email) => {
 		return User.find({ email: email }).exec()
@@ -253,7 +254,7 @@ exports.getUserByEmail = (req, res) => {
 			"username": username1,
 			"exerciseHistory": d
 		}
-		return res.status(200).json(userJson)
+		return res.status(200).json({user: userJson})
 	}
 
 	try {
@@ -459,9 +460,12 @@ exports.uploadProfileImage = (req, res) => {
 	let imgbuffer;
 
 	const zip1 = () => {
-		return sharp(req.file.buffer)  // 압축할 이미지 경로
-			.resize({ width: 500 }) // 비율을 유지하며 가로 크기 줄이기
+		return sharp(req.file.buffer)
 			.withMetadata()	// 이미지의 exif데이터 유지
+			.png({
+				quality: 80,
+
+			})
 			.toBuffer().then((data) => {
 				imgbuffer = data;
 			})
@@ -512,6 +516,7 @@ exports.uploadProfileImage = (req, res) => {
  * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
  * @apiQuery {String} reqType email or username or self
+ * @apiQuery {String} resType url or buffer
  * @apiQuery {String} username (Optional) if you want to other user's image, input it.
  * @apiQuery {String} email (Optional) if you want to other user's image, input it.
  * @apiSuccess {Object} img ImageBuffer..
@@ -533,19 +538,12 @@ exports.uploadProfileImage = (req, res) => {
 					data : Buffer(ex: [123,0,1,0,0,...])
 			}
 			
-		]
+ 		}
  *	}
  *  @apiSuccessExample {json} Success - url:
  *	HTTP/1.1 200 OK
  *	{
-		"exerciseImages" : [
-			{
-				"date" : "2021-09-16",
-				"time" : "22:01:13",
-				"_id" : "uuid" 
-			},
-			...
-		]
+		"img" : "uuid"
  *	}
  */
 exports.getProfileImg = (req, res) => {
@@ -565,7 +563,7 @@ exports.getProfileImg = (req, res) => {
 		}
 	}
 	const getImg = (user) => {
-		return Profile.findOne({ uid: user._id }, { img: 1, _id: 0 }).exec()
+		return Profile.findOne({ uid: user._id }, { img: 1, _id: 1 }).exec()
 	}
 	const send = (dt) => {
 		if (CheckModule.isEmpty(dt)) {
@@ -573,9 +571,11 @@ exports.getProfileImg = (req, res) => {
 				error: "did not set profile yet"
 			})
 		} else {
-			return res.status(200).json({
-				img: dt.img
-			})
+			if(req.query.resType == "url")
+				return res.status(200).json({ img: dt._id })
+			else {
+				return res.status(200).json({ img: dt.img })
+			}
 		}
 
 	}

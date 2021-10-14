@@ -3,6 +3,7 @@ const Posts = require('../../../../models/posts')
 const Exercise = require("../../../../models/Exercise")
 const ExerciseImage = require("../../../../models/ExerciseImg")
 const config = require('../../../../config.js')
+const sharp = require("sharp");
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const moment = require('moment-timezone')
@@ -228,8 +229,21 @@ exports.uploadMyExPhoto = (req ,res) => {
 	const currentDateToStr = moment().tz("Asia/Seoul").format("YYYY-MM-DD")
 	const currentTimeToStr = moment().tz('Asia/Seoul').format("HH:mm:ss") 
 
+	let imgbuffer;
+
+	const zip1 = () => {
+		return sharp(req.file.buffer)
+			.withMetadata()	// 이미지의 exif데이터 유지
+			.png({
+				quality: 80,
+
+			})
+			.toBuffer().then((data) => {
+				imgbuffer = data;
+			})
+	}
+
 	const uploadImg = () => {
-		const imgbuffer = req.file.buffer;
 		if(imgbuffer.truncated) {
 			return res.status(413).json({error: "Payload Too Large"})
 		}
@@ -253,6 +267,7 @@ exports.uploadMyExPhoto = (req ,res) => {
 		if(req.file.buffer == "") {
 			return res.status(400).json({error: "Data must not be null"})
 		}
+		zip1();
 		uploadImg().then(send)
 	} catch(e) {
 		console.error(e)
@@ -268,6 +283,7 @@ exports.uploadMyExPhoto = (req ,res) => {
  * @apiVersion 1.0.0
  * @apiHeader {String} x-access-token user's jwt token
  * @apiQuery {String} date YYYY-MM-DD or "" 
+ * @apiQuery {String} resType url or buffer
  * @apiSuccess {List} exerciseImages List Image
  * @apiErrorExample {json} Something Error:
  *	HTTP/1.1 500 Internal Server Error

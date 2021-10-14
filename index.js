@@ -10,7 +10,8 @@ const moment = require('moment-timezone')
 const httpError = require('./middlewares/httpError')
 const compression = require('compression');
 
-
+/**/
+/**/
 
 
 
@@ -67,12 +68,19 @@ app.get('/',logMiddleware.consoleLog , (req, res) => {
 	res.status(200).json(d);
 });
 
+app.get('/easter',(req,res) => {
+	return res.status(200).json({
+		easter1: "7Lac66Cl7ISg67Cw6rCAIOyggOulvCDqtLTroa3tnpnri4jri6Qu",
+		easter2: "7J207KCV7J24IOyXv+ydtOuCmCDrk5zshLjsmpQ=",
+		easter3: ""
+	})
+})
 
 app.use('/api', require('./routes/api'));
 
 
 app.use(httpError.pageNotFoundError)
-app.use(httpError.respondInternalError)
+//app.use(httpError.respondInternalError)
 const server = app.listen(config.port || 3000, () => {
 	console.log('server is now running');
 });

@@ -92,8 +92,47 @@ exports.getFriendsList = (req,res) => {
  *		"error": "Token Expired"
  *	}
  */
+/*
 exports.addFriend = (req,res) => {
+	let anotherUid = "";
+	const getUser = () => {
+		if(req.query.reqType == "username") {
+			if(!CheckModule.isEmpty(req.body.username)) {
+				return User.findOne({username: req.body.username}).exec()
+			} else {
+				return res.status(400).json({error: "Data must not be null"})
+			}
+				
+		} else if (req.query.reqType == "email") {
+			if(!CheckModule.isEmpty(req.body.email)) {
+				return User.findOne({email: req.body.email}).exec()
+			} else {
+				return res.status(400).json({error: "Data must not be null"})
+			}
+		} 
+	}
+
+	const addMyList = (another) => {
+		anotherUid = another._id;
+		return Friend.updateOne({uid: res.locals._id},{
+			'$addToSet': {
+				friends:anotherUid
+			}
+		}).exec()
+	}
+
+	const addAnotherList = (dummy) => {
+		return Friend.up
+	}
+}*/
+
+
+exports.addFriend = (req,res) => {
+
+	let anotherUid = "";
+
 	const getAnotherUser = () => {
+		console.log(req.query.reqType)
 		switch(req.query.reqType) {
 			case "username":
 				if(!CheckModule.isEmpty(req.body.username)) 
@@ -101,6 +140,7 @@ exports.addFriend = (req,res) => {
 				else return res.status(400).json({error: "Data must not be null"})
 				break;
 			case "email":
+				console.log("just test pos1")
 			default:
 				if(!CheckModule.isEmpty(req.body.email)) 
 					return User.findOne({email: req.body.email}).exec()
@@ -110,29 +150,33 @@ exports.addFriend = (req,res) => {
 			
 	}
 	const addMyList = (another) => {
+		anotherUid = another._id;
+		console.log("just test pos2" + anotherUid)
 		return Friend.updateOne({
 			uid: res.locals._id
 		},{
 			'$addToSet': {
-				friends:another._id
-				
+				friends:anotherUid
 			}
-		})
+		}).exec()
 	} 
 	const addAnother = (another) => {
 		return Friend.updateOne({
-			uid: another._id
+			uid: anotherUid
 		},{
 			'$addToSet': {
 				friends: res.locals._id
 			}
-		})
+		}).exec()
 	}
 	const send = (data) => {
 		return res.status(200).json({result: true})
 	}
 	try {
-		getAnotherUser().then(addMyList).then(getAnotherUser).then(addAnother).then(send)
+		console.log("123"+req.query);
+		console.log("!231"+req.body);
+		
+		getAnotherUser().then(addMyList).then(addAnother).then(send)
 	}catch(err) {
 		console.error(err)
 		return res.status(500).json({error: err.message})

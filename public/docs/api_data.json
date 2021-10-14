@@ -448,6 +448,13 @@
         "optional": false,
         "field": "date",
         "description": "<p>YYYY-MM-DD or &quot;&quot;</p>"
+      },
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "resType",
+        "description": "<p>url or buffer</p>"
       }
     ],
     "success": {
@@ -464,8 +471,13 @@
       },
       "examples": [
         {
-          "title": "Success:",
+          "title": "Success - buffer:",
           "content": "HTTP/1.1 200 OK\n{\n\t\"exerciseImages\" : [\n\t\t{\n\t\t\t\"date\" : \"2021-09-16\",\n\t\t\t\"time\" : \"22:01:13\",\n\t\t\t\"img\" : {\n\t\t\t\ttype : \"Buffer\",\n\t\t\t\tdata : Buffer(ex: [123,0,1,0,0,...])\n\t\t\t}\n\t\t},\n\t\t...\n\t]\n}",
+          "type": "json"
+        },
+        {
+          "title": "Success - url:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"exerciseImages\" : [\n\t\t{\n\t\t\t\"date\" : \"2021-09-16\",\n\t\t\t\"time\" : \"22:01:13\",\n\t\t\t\"_id\" : \"uuid\" \n\t\t},\n\t\t...\n\t]\n}",
           "type": "json"
         }
       ]
@@ -1138,6 +1150,13 @@
         "group": "Query",
         "type": "String",
         "optional": false,
+        "field": "resType",
+        "description": "<p>url or buffer</p>"
+      },
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
         "field": "username",
         "description": "<p>(Optional) if you want to other user's image, input it.</p>"
       },
@@ -1163,8 +1182,13 @@
       },
       "examples": [
         {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"img\" : {\n\t\t\t\ttype : \"Buffer\",\n\t\t\t\tdata : Buffer(ex: [123,0,1,0,0,...])\n\t\t}\n\t\t\n\t]\n}",
+          "title": "Success - buffer:",
+          "content": "\tHTTP/1.1 200 OK\n\t{\n\t\t\"img\" : {\n\t\t\t\t\ttype : \"Buffer\",\n\t\t\t\t\tdata : Buffer(ex: [123,0,1,0,0,...])\n\t\t\t}\n\t\t\t\n \t\t}\n\t}",
+          "type": "json"
+        },
+        {
+          "title": "Success - url:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"img\" : \"uuid\"\n}",
           "type": "json"
         }
       ]
