@@ -12,21 +12,21 @@
         "type": "String",
         "optional": false,
         "field": "username",
-        "description": ""
+        "description": "<p>user's username</p>"
       },
       {
         "group": "Body",
         "type": "String",
         "optional": false,
         "field": "email",
-        "description": ""
+        "description": "<p>user's email</p>"
       },
       {
         "group": "Body",
         "type": "String",
         "optional": false,
         "field": "password",
-        "description": ""
+        "description": "<p>user's password</p>"
       }
     ],
     "success": {
@@ -828,18 +828,16 @@
         "optional": false,
         "field": "reqType",
         "description": "<p>email or username</p>"
-      }
-    ],
-    "body": [
+      },
       {
-        "group": "Body",
+        "group": "Query",
         "type": "String",
         "optional": false,
         "field": "username",
         "description": "<p>if you want to add friend as friend's username</p>"
       },
       {
-        "group": "Body",
+        "group": "Query",
         "type": "String",
         "optional": false,
         "field": "email",
@@ -971,18 +969,16 @@
         "optional": false,
         "field": "reqType",
         "description": "<p>email or username</p>"
-      }
-    ],
-    "body": [
+      },
       {
-        "group": "Body",
+        "group": "Query",
         "type": "String",
         "optional": false,
         "field": "username",
         "description": "<p>if you want to add friend as friend's username</p>"
       },
       {
-        "group": "Body",
+        "group": "Query",
         "type": "String",
         "optional": false,
         "field": "email",
@@ -1258,7 +1254,7 @@
       "examples": [
         {
           "title": "Success:",
-          "content": "\tHTTP/1.1 200 OK\n\t{\n\t\tuser: {\n    \t\t\"_id\": \"3cda3912...\",\n    \t\t\"email\": \"test@test.com\",\n    \t\t\"username\": \"testUsername\",\n\t\t\t\"exerciseHistory\": [\n\t\t\t\t{\n\t\t\t\t\t\"calorie\":10\n\t\t\t\t\t\"km\":0.045,\n\t\t\t\t\t\"time\": 4312,\n\t\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t\t},\n\t\t\t\t...\n\t\t\t]\n\n  \t\t}\n\t}",
+          "content": "\tHTTP/1.1 200 OK\n\t{\n\t\t\"_id\": \"3cda3912...\",\n    \t\"email\": \"test@test.com\",\n   \t\t\"username\": \"testUsername\",\n\t\t\"exerciseHistory\": [\n\t\t\t{\n\t\t\t\t\"calorie\":10\n\t\t\t\t\"km\":0.045,\n\t\t\t\t\"time\": 4312,\n\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t},\n\t\t\t...\n\t\t]\n\t}",
           "type": "json"
         }
       ]
@@ -1328,7 +1324,7 @@
       "examples": [
         {
           "title": "Success:",
-          "content": "\tHTTP/1.1 200 OK\n\t{\n     user: {\n    \t\t\"_id\": \"3cda3912...\",\n    \t\t\"email\": \"test@test.com\",\n    \t\t\"username\": \"testUsername\",\n\t\t\t\"exerciseHistory\": [\n\t\t\t\t{\n\t\t\t\t\t\"calorie\":10\n\t\t\t\t\t\"km\":0.045,\n\t\t\t\t\t\"time\": 4312,\n\t\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t\t},\n\t\t\t\t...\n\t\t\t]\n\n  \t\t}\n\t}",
+          "content": "\tHTTP/1.1 200 OK\n\t{\n  \n    \t\"_id\": \"3cda3912...\",\n    \t\"email\": \"test@test.com\",\n    \t\"username\": \"testUsername\",\n\t\t\"exerciseHistory\": [\n\t\t\t{\n\t\t\t\t\"calorie\":10\n\t\t\t\t\"km\":0.045,\n\t\t\t\t\"time\": 4312,\n\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t},\n\t\t\t...\n\t\t]\n\t}",
           "type": "json"
         }
       ]

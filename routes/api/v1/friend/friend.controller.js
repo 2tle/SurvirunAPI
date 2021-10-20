@@ -77,8 +77,8 @@ exports.getFriendsList = (req,res) => {
  * @apiGroup Friend
  * @apiHeader {String} x-access-token user's jwt token
  * @apiQuery {String} reqType email or username
- * @apiBody {String} username if you want to add friend as friend's username
- * @apiBody {String} email if you want to add friend as friend's email
+ * @apiQuery {String} username if you want to add friend as friend's username
+ * @apiQuery {String} email if you want to add friend as friend's email
  * @apiVersion 1.0.0
  * @apiSuccess {Boolean} result true or false
  * @apiSuccessExample {json} Success:
@@ -92,40 +92,8 @@ exports.getFriendsList = (req,res) => {
  *		"error": "Token Expired"
  *	}
  */
-/*
-exports.addFriend = (req,res) => {
-	let anotherUid = "";
-	const getUser = () => {
-		if(req.query.reqType == "username") {
-			if(!CheckModule.isEmpty(req.body.username)) {
-				return User.findOne({username: req.body.username}).exec()
-			} else {
-				return res.status(400).json({error: "Data must not be null"})
-			}
-				
-		} else if (req.query.reqType == "email") {
-			if(!CheckModule.isEmpty(req.body.email)) {
-				return User.findOne({email: req.body.email}).exec()
-			} else {
-				return res.status(400).json({error: "Data must not be null"})
-			}
-		} 
-	}
 
-	const addMyList = (another) => {
-		anotherUid = another._id;
-		return Friend.updateOne({uid: res.locals._id},{
-			'$addToSet': {
-				friends:anotherUid
-			}
-		}).exec()
-	}
-
-	const addAnotherList = (dummy) => {
-		return Friend.up
-	}
-}*/
-
+	
 
 exports.addFriend = (req,res) => {
 
@@ -135,16 +103,17 @@ exports.addFriend = (req,res) => {
 		console.log(req.query.reqType)
 		switch(req.query.reqType) {
 			case "username":
-				if(!CheckModule.isEmpty(req.body.username)) 
-					return User.findOne({username: req.body.username}).exec()
-				else return res.status(400).json({error: "Data must not be null"})
+				if(!CheckModule.isEmpty(req.query.username)) 
+					return User.findOne({username: req.query.username}).exec()
+				else 
+					throw new Error("Data Must Not Be Null")
 				break;
 			case "email":
 				console.log("just test pos1")
 			default:
-				if(!CheckModule.isEmpty(req.body.email)) 
-					return User.findOne({email: req.body.email}).exec()
-				else return res.status(400).json({error: "Data must not be null"})
+				if(!CheckModule.isEmpty(req.query.email)) 
+					return User.findOne({email: req.query.email}).exec()
+				else throw new Error("Data Must Not Be Null")
 				break;
 		}
 			
@@ -173,8 +142,8 @@ exports.addFriend = (req,res) => {
 		return res.status(200).json({result: true})
 	}
 	try {
-		console.log("123"+req.query);
-		console.log("!231"+req.body);
+		//console.log("123"+req.query);
+		console.log("!231"+req.query.email);
 		
 		getAnotherUser().then(addMyList).then(addAnother).then(send)
 	}catch(err) {
@@ -188,8 +157,8 @@ exports.addFriend = (req,res) => {
  * @apiGroup Friend
  * @apiHeader {String} x-access-token user's jwt token
  * @apiQuery {String} reqType email or username
- * @apiBody {String} username if you want to add friend as friend's username
- * @apiBody {String} email if you want to add friend as friend's email
+ * @apiQuery {String} username if you want to add friend as friend's username
+ * @apiQuery {String} email if you want to add friend as friend's email
  * @apiSuccess {Boolean} result true or false
  * @apiVersion 1.0.0
  * @apiSuccessExample {json} Success:
@@ -204,34 +173,37 @@ exports.addFriend = (req,res) => {
  *	}
  */
 exports.removeFriend = (req, res) => {
+	let anotherUid = "";
+	
 	const getAnotherUser = () => {
 		switch(req.query.reqType) {
 			case "username":
-				if(!CheckModule.isEmpty(req.body.username)) 
-					return User.findOne({username: req.body.username}).exec()
+				if(!CheckModule.isEmpty(req.query.username)) 
+					return User.findOne({username: req.query.username}).exec()
 				else return res.status(400).json({error: "Data must not be null"})
 				break;
 			case "email":
 			default:
-				if(!CheckModule.isEmpty(req.body.email)) 
-					return User.findOne({email: req.body.email}).exec()
+				if(!CheckModule.isEmpty(req.query.email)) 
+					return User.findOne({email: req.query.email}).exec()
 				else return res.status(400).json({error: "Data must not be null"})
 				break;
 		}
 	}
-	const addMyList = (another) => {
+	const removeMyList = (another) => {
+		anotherUid = another._id;
 		return Friend.updateOne({
 			uid: res.locals._id
 		},{
 			'$pull': {
-				friends: another._id
+				friends: anotherUid
 				
 			}
 		})
 	} 
-	const addAnother = (another) => {
+	const removeAnother = (another) => {
 		return Friend.updateOne({
-			uid: another._id
+			uid: anotherUid
 		},{
 			'$pull': {
 				friends: res.locals._id
@@ -242,7 +214,7 @@ exports.removeFriend = (req, res) => {
 		return res.status(200).json({result: true})
 	}
 	try {
-		getAnotherUser().then(addMyList).then(getAnotherUser).then(addAnother).then(send)
+		getAnotherUser().then(removeMyList).then(removeAnother).then(send)
 	}catch(err) {
 		console.error(err)
 		return res.status(500).json({error: err.message})

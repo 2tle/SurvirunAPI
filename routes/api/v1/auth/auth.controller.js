@@ -115,21 +115,19 @@ exports.emailExists = (req, res) => {
  * @apiSuccessExample {json} Success:
  *	HTTP/1.1 200 OK
  *	{
- *      user: {
-    		"_id": "3cda3912...",
-    		"email": "test@test.com",
-    		"username": "testUsername",
-			"exerciseHistory": [
-				{
-					"calorie":10
-					"km":0.045,
-					"time": 4312,
-					"date":"2021-09-13"
-				},
-				...
-			]
-
-  		}
+ *   
+    	"_id": "3cda3912...",
+    	"email": "test@test.com",
+    	"username": "testUsername",
+		"exerciseHistory": [
+			{
+				"calorie":10
+				"km":0.045,
+				"time": 4312,
+				"date":"2021-09-13"
+			},
+			...
+		]
  *	}
  */
 exports.getUserByUsername = (req, res) => {
@@ -165,7 +163,7 @@ exports.getUserByUsername = (req, res) => {
 			"username": username1,
 			"exerciseHistory": d
 		}
-		return res.status(200).json({user: userJson})
+		return res.status(200).json(userJson)
 	}
 
 	try {
@@ -206,21 +204,18 @@ exports.getUserByUsername = (req, res) => {
  * @apiSuccessExample {json} Success:
  *	HTTP/1.1 200 OK
  * 	{
- * 		user: {
-    		"_id": "3cda3912...",
-    		"email": "test@test.com",
-    		"username": "testUsername",
-			"exerciseHistory": [
-				{
-					"calorie":10
-					"km":0.045,
-					"time": 4312,
-					"date":"2021-09-13"
-				},
-				...
-			]
-
-  		}
+ * 		"_id": "3cda3912...",
+    	"email": "test@test.com",
+   		"username": "testUsername",
+		"exerciseHistory": [
+			{
+				"calorie":10
+				"km":0.045,
+				"time": 4312,
+				"date":"2021-09-13"
+			},
+			...
+		]
  * 	}
  */
 exports.getUserByEmail = (req, res) => {
@@ -254,7 +249,7 @@ exports.getUserByEmail = (req, res) => {
 			"username": username1,
 			"exerciseHistory": d
 		}
-		return res.status(200).json({user: userJson})
+		return res.status(200).json(userJson)
 	}
 
 	try {
@@ -279,9 +274,9 @@ exports.getUserByEmail = (req, res) => {
  * @apiName CreateNewUser
  * @apiGroup Auth
  * @apiVersion 1.0.0
- * @apiBody {String} username
- * @apiBody {String} email
- * @apiBody {String} password 
+ * @apiBody {String} username user's username
+ * @apiBody {String} email user's email
+ * @apiBody {String} password user's password
  * @apiSuccess {String} token user's jwt token
  * @apiErrorExample {json} Not Found email:
  *	HTTP/1.1 400 Bad Request
@@ -475,7 +470,7 @@ exports.uploadProfileImage = (req, res) => {
 	}
 
 	const uploadImg = (findOne) => {
-		//const imgbuffer = req.file.buffer;
+		const imgbuffer = req.file.buffer;
 		if (imgbuffer.truncated) {
 			return res.status(413).json({ error: "Payload Too Large" })
 		}
