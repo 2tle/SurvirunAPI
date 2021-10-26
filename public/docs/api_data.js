@@ -944,6 +944,81 @@ define({ "api": [
     "groupTitle": "Friend"
   },
   {
+    "type": "get",
+    "url": "/api/v1/friend/check",
+    "title": "Request to check isFriend?",
+    "name": "GetIsFriend",
+    "group": "Friend",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "query": [
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "reqType",
+        "description": "<p>email or username</p>"
+      },
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "username",
+        "description": "<p>if you want to add friend as friend's username</p>"
+      },
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "email",
+        "description": "<p>if you want to add friend as friend's email</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>true or false</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "1.0.0",
+    "error": {
+      "examples": [
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/friend/friend.controller.js",
+    "groupTitle": "Friend"
+  },
+  {
     "type": "patch",
     "url": "/api/v1/friend",
     "title": "Request to remove user's friend",

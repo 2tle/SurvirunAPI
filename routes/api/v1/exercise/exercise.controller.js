@@ -41,7 +41,7 @@ const upload = {
 		"date":"2021-09-13"	
  *	}
  */
-exports.getExerciseData = (req, res) => { //today
+exports.getExerciseData = (req, res, next) => { //today
 	const currentTimeToStr = moment().tz("Asia/Seoul").format("YYYY-MM-DD")
 	const getData = () => {
 		return Exercise.findOne({ uid: res.locals._id, date: currentTimeToStr },{_id:0,uid:0,__v:0})
@@ -62,12 +62,9 @@ exports.getExerciseData = (req, res) => { //today
 		}
 	}
 
-	try {
-		getData().then(send)
-	} catch (err) {
-		console.error(err)
-		return res.status(500).json({ error: err.message })
-	}
+	
+	getData().then(send)
+	
 
 }
 /**
@@ -102,28 +99,17 @@ exports.getExerciseData = (req, res) => { //today
 		"date":"2021-09-13"	
  *	}
  */
-exports.updateExerciseData = (req, res) => {
+exports.updateExerciseData = (req, res, next) => {
 	const currentTimeToStr = moment().tz("Asia/Seoul").format("YYYY-MM-DD")
 	const { calorie, km, time } = req.body;
 	const update = () => {
-
-		//console.log(currentTimeToStr)
-		/*const q = Exercise.updateOne({uid: res.locals._id, date:currentTimeToStr},{$inc: {calorie:c, km:k, time:t}, $set: {uid: res.locals._id, date:currentTimeToStr}},{upsert: true})
-		return Exercise.find({uid: res.locals._id, date:currentTimeToStr}).exec() */
 		return Exercise.findOne({ uid: res.locals._id, date: currentTimeToStr }).exec()
-		//console.log(tt)
-
-
-
 	}
 
 	const check = (ck) => {
-		console.log(ck == null ? 1 : 2)
 		if (ck == null) {
-			//parseInt(calorie),parseFloat(km),parseInt(time)
 			const e = new Exercise({ uid: res.locals._id, date: currentTimeToStr, calorie: parseInt(calorie), km: parseFloat(km), time: parseInt(time) })
 			return e.save()
-			//return Exercise.findOne({uid: res.locals._id, date:currentTimeToStr}).exec()
 		} else {
 			return Exercise.update({ uid: res.locals._id, date: currentTimeToStr }, { "$inc": { 'calorie': parseInt(calorie), 'km': parseFloat(km), 'time': parseInt(time) } }).exec()
 
@@ -137,13 +123,8 @@ exports.updateExerciseData = (req, res) => {
 		return res.status(200).json(ex)
 	}
 
-	try {
-		console.log(calorie, km, time)
-		update().then(check).then(tct).then(send)
-	} catch (err) {
-		console.error(err)
-		return res.status(500).json({ error: err.message })
-	}
+	update().then(check).then(tct).then(send)
+	
 }
 
 /**
@@ -183,7 +164,7 @@ exports.updateExerciseData = (req, res) => {
 		]
  *	}
  */
-exports.getExerList = (req,res) => {
+exports.getExerList = (req, res, next)=> {
 	
 	const getData = () => {
 		return Exercise.find({ uid: res.locals._id },{_id:0, uid: 0,__v:0}).sort({ "date": -1 }).limit(7).exec()
@@ -192,12 +173,8 @@ exports.getExerList = (req,res) => {
 		return res.status(200).json({exerciseHistory: d})
 	}
 
-	try {
-		getData().then(send)
-	} catch(err) {
-		consol.error(err)
-		return res.status(500).json({error: err.message})
-	}
+	getData().then(send)
+	
 } 
 
 /**
@@ -225,7 +202,7 @@ exports.getExerList = (req,res) => {
 		"result" : true
  *	}
  */
-exports.uploadMyExPhoto = (req ,res) => { 
+exports.uploadMyExPhoto = (req, res, next)=> { 
 	const currentDateToStr = moment().tz("Asia/Seoul").format("YYYY-MM-DD")
 	const currentTimeToStr = moment().tz('Asia/Seoul').format("HH:mm:ss") 
 
@@ -245,7 +222,8 @@ exports.uploadMyExPhoto = (req ,res) => {
 
 	const uploadImg = () => {
 		if(imgbuffer.truncated) {
-			return res.status(413).json({error: "Payload Too Large"})
+			res.status(413)
+			throw new Error("3")
 		}
 			
 		const img = new ExerciseImage({
@@ -262,17 +240,13 @@ exports.uploadMyExPhoto = (req ,res) => {
 		return res.status(200).json({result: true})
 	}
 
-	try {
-		//console.log(body)
-		if(req.file.buffer == "") {
-			return res.status(400).json({error: "Data must not be null"})
-		}
-		zip1();
-		uploadImg().then(send)
-	} catch(e) {
-		console.error(e)
-		return res.status(500).json({error: e.message})
-	} 
+	if(req.file.buffer == "") {
+		res.status(400)
+		throw new Error("1")
+	}
+	zip1();
+	uploadImg().then(send)
+	
 }
 
 
@@ -323,7 +297,7 @@ exports.uploadMyExPhoto = (req ,res) => {
 		]
  *	}
  */
-exports.getImages = (req,res) => {
+exports.getImages = (req, res, next) => {
 	const getData = () => {
 		if(req.query.date != "") {
 			if(req.query.resType == "url")
@@ -344,12 +318,8 @@ exports.getImages = (req,res) => {
 		})
 	}
 
-	try {
-		getData().then(send)
-	} catch(e) {
-		console.error(e)
-		return res.status(500).json({error: e.message})
-	}
+	getData().then(send)
+	
 }
 
 

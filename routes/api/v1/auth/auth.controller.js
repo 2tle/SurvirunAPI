@@ -31,7 +31,7 @@ const crypto = require('crypto')
  *		"exists": true
  *	}
  */
-exports.usernameExists = (req, res) => {
+exports.usernameExists = (req, res, next) => {
 
 	const getUser = (username) => {
 		return User.find({ username: username }).exec()
@@ -43,14 +43,14 @@ exports.usernameExists = (req, res) => {
 	}
 
 
-	try {
-		const username = req.params.username
-		if (!username) return res.status(400).json({ error: "username must not be null" })
-		getUser(username).then(check)
-	} catch (err) {
-		console.error(err.message)
-		return res.status(500).json({ error: "Internal Server Error" })
+	
+	const username = req.params.username
+	if (!username) { 
+		res.status(400)
+		throw new Error("1")
 	}
+	getUser(username).then(check)
+	
 }
 
 /**
@@ -71,7 +71,7 @@ exports.usernameExists = (req, res) => {
  *		"exists": true
  *	}
  */
-exports.emailExists = (req, res) => {
+exports.emailExists = (req, res, next) => {
 
 
 	const getUser = (email) => {
@@ -83,14 +83,14 @@ exports.emailExists = (req, res) => {
 		else return res.status(200).json({ exists: true })
 	}
 
-	try {
-		const email = req.params.email
-		if (!email) return res.status(400).json({ error: "email must not be null" })
-		getUser(email).then(check)
-	} catch (err) {
-		console.error(err.message)
-		return res.status(500).json({ error: err.message })
+	
+	const email = req.params.email
+	if (!email) {
+		res.status(400)
+		throw new Error("1")
 	}
+	getUser(email).then(check)
+	
 }
 
 
@@ -130,7 +130,7 @@ exports.emailExists = (req, res) => {
 		]
  *	}
  */
-exports.getUserByUsername = (req, res) => {
+exports.getUserByUsername = (req, res, next) => {
 
 	var id1 = ''
 	var email1 = ''
@@ -143,7 +143,10 @@ exports.getUserByUsername = (req, res) => {
 	}
 
 	const check = (user) => {
-		if (!user.length) return res.status(404).json({ user: null })
+		if (!user.length) {
+			res.status(404)
+			throw new Error("2")
+		}
 		else return user
 	}
 
@@ -166,15 +169,15 @@ exports.getUserByUsername = (req, res) => {
 		return res.status(200).json(userJson)
 	}
 
-	try {
-		const username = decodeURI(req.params.username)
 
-		if (!username) return res.status(400).json({ error: "email must not be null" })
-		getUser(username).then(check).then(dataProcess).then(send)
-	} catch (err) {
-		console.error(err.message)
-		return res.status(500).json({ error: err.message })
+	const username = decodeURI(req.params.username)
+
+	if (!username) {
+		res.status(400)
+		throw new Error("1")
 	}
+	getUser(username).then(check).then(dataProcess).then(send)
+	
 }
 
 
@@ -218,7 +221,7 @@ exports.getUserByUsername = (req, res) => {
 		]
  * 	}
  */
-exports.getUserByEmail = (req, res) => {
+exports.getUserByEmail = (req, res, next) => {
 	let id1 = ''
 	let email1 = ''
 	let username1 = ''
@@ -229,7 +232,10 @@ exports.getUserByEmail = (req, res) => {
 	}
 
 	const check = (user) => {
-		if (!user.length) return res.status(404).json({ user: null })
+		if (!user.length) {
+			res.status(404)
+			throw new Error("2")
+		}
 		else return user
 	}
 
@@ -252,15 +258,16 @@ exports.getUserByEmail = (req, res) => {
 		return res.status(200).json(userJson)
 	}
 
-	try {
-		const email = decodeURI(req.params.email)
+	
+	const email = decodeURI(req.params.email)
 
-		if (!email) return res.status(400).json({ error: "email must not be null" })
-		getUser(email).then(check).then(dataProcess).then(send)
-	} catch (err) {
-		console.error(err.message)
-		return res.status(500).json({ error: err.message })
+	if (!email) {
+		res.status(400)
+		throw new Error("1")
 	}
+	getUser(email).then(check).then(dataProcess).then(send)
+	
+	
 }
 
 
@@ -294,7 +301,7 @@ exports.getUserByEmail = (req, res) => {
  *		"error": "Token Expired"
  *	}
  */
-exports.createNewUser = (req, res) => {
+exports.createNewUser = (req, res, next) => {
 
 	const createUser = (email, username, password) => {
 		const newUser = new User({ email: email, username: username, password: password })
@@ -322,17 +329,15 @@ exports.createNewUser = (req, res) => {
 		})
 	}
 
-	try {
-		const { email, username } = req.body;
-		if (email == "" || req.body.password == "") {
-			return res.status(400).json({ error: "Data must not be null" })
-		}
-		const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
-		createUser(email, username, password).then(createToken)
-	} catch (err) {
-		console.error(err.message)
-		return res.status(500).json({ error: err.message })
+	
+	const { email, username } = req.body;
+	if (email == "" || req.body.password == "") {
+		res.status(400)
+		throw new Error("1")
 	}
+	const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
+	createUser(email, username, password).then(createToken)
+	
 
 }
 
@@ -365,7 +370,7 @@ exports.createNewUser = (req, res) => {
  *	}
  */
 
-exports.createToken = (req, res) => {
+exports.createToken = (req, res, next) => {
 	let isUserNameCreated;
 	let isProfileImgUploaded;
 	let token;
@@ -390,15 +395,10 @@ exports.createToken = (req, res) => {
 			isUserNameCreated = !CheckModule.isEmpty(user.username)
 			return Profile.findOne({ uid: userId })
 
-			//return 
-			/*
-			res.status(200).json({
-				token: token
-			})*/
 		} else {
-			res.status(404).json({
-				error: "Not Found User"
-			})
+			res.status(404)
+			throw new Error("2")
+			
 		}
 
 	}
@@ -411,17 +411,15 @@ exports.createToken = (req, res) => {
 			profile: isProfileImgUploaded
 		})
 	}
-	try {
-		if (req.body.email == "" || req.body.password == "") {
-			return res.status(400).json({ error: "Data must not be null" })
-		}
-		const email = req.body.email;
-		const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
-		getUser(email, password).then(createToken).then(pimgc)
-	} catch (err) {
-		console.error(err.message)
-		return res.status(500).json({ error: err.message })
+	
+	if (req.body.email == "" || req.body.password == "") {
+		res.status(400)
+		throw new Error("1")
 	}
+	const email = req.body.email;
+	const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
+	getUser(email, password).then(createToken).then(pimgc)
+	
 }
 
 
@@ -450,7 +448,7 @@ exports.createToken = (req, res) => {
 		"result" : true
  *	}
  */
-exports.uploadProfileImage = (req, res) => {
+exports.uploadProfileImage = (req, res, next) => {
 
 	let imgbuffer;
 
@@ -472,7 +470,8 @@ exports.uploadProfileImage = (req, res) => {
 	const uploadImg = (findOne) => {
 		const imgbuffer = req.file.buffer;
 		if (imgbuffer.truncated) {
-			return res.status(413).json({ error: "Payload Too Large" })
+			res.status(413)
+			throw new Error("3")
 		}
 		if (!findOne) {
 			const img = new Profile({
@@ -491,17 +490,14 @@ exports.uploadProfileImage = (req, res) => {
 		return res.status(200).json({ result: true })
 	}
 
-	try {
 
-		if (!req.file.buffer) {
-			return res.status(400).json({ error: "Data must not be null" })
-		}
-		zip1();
-		findOne().then(uploadImg).then(send)
-	} catch (e) {
-		console.error(e)
-		return res.status(500).json({ error: e.message })
+	if (!req.file.buffer) {
+		res.status(400)
+		throw new Error("1")
 	}
+	zip1()
+	findOne().then(uploadImg).then(send)
+	
 }
 
 /**
@@ -541,15 +537,21 @@ exports.uploadProfileImage = (req, res) => {
 		"img" : "uuid"
  *	}
  */
-exports.getProfileImg = (req, res) => {
+exports.getProfileImg = (req, res, next) => {
 	const getData = () => {
 		switch (req.query.reqType) {
 			case "username":
-				if (CheckModule.isEmpty(req.query.username)) return res.status(400).json({ error: "data must not be null" })
+				if (CheckModule.isEmpty(req.query.username)){
+					res.status(400)
+					throw new Error("1")
+				}
 				else return User.findOne({ username: req.query.username }, { _id: 1 }).exec()
 				break;
 			case "email":
-				if (CheckModule.isEmpty(req.query.email)) return res.status(400).json({ error: "data must not be null" })
+				if (CheckModule.isEmpty(req.query.email)) {
+					res.status(400)
+					throw new Error("1")
+				}
 				else return User.findOne({ email: req.query.email }, { _id: 1 }).exec()
 				break;
 			default:
@@ -562,9 +564,8 @@ exports.getProfileImg = (req, res) => {
 	}
 	const send = (dt) => {
 		if (CheckModule.isEmpty(dt)) {
-			return res.status(400).json({
-				error: "did not set profile yet"
-			})
+			res.status(400)
+			throw new Error("4")
 		} else {
 			if(req.query.resType == "url")
 				return res.status(200).json({ img: dt._id })
@@ -575,14 +576,8 @@ exports.getProfileImg = (req, res) => {
 
 	}
 
-	try {
-		getData().then(getImg).then(send)
-	} catch (e) {
-		console.error(e)
-		return res.status(500).json({
-			error: e.message
-		})
-	}
+	getData().then(getImg).then(send)
+	
 }
 
 
@@ -637,22 +632,20 @@ exports.getProfileImg = (req, res) => {
  *		"error": "Token Expired"
  *	}
  */
-exports.updateUsername = (req, res) => {
+exports.updateUsername = (req, res, next) => {
 	const update = (username) => {
 		return User.updateOne({ _id: res.locals._id }, { $set: { username: username } }).exec()
 	}
 	const send = (t) => {
 		return res.status(200).json({ result: true })
 	}
-	try {
-		if (req.params.username == "") {
-			return res.status(400).json({ error: "Data must not be null" })
-		}
-		update(req.params.username).then(send)
-	} catch (err) {
-		console.error(err)
-		return res.status(500).json({ error: err.message })
+	
+	if (req.params.username == "") {
+		res.status(400)
+		throw new Error("1")
 	}
+	update(req.params.username).then(send)
+	
 }
 /**
  * @api {patch} /api/v1/auth/password Request to update password
@@ -673,7 +666,7 @@ exports.updateUsername = (req, res) => {
  *		"error": "Token Expired"
  *	}
  */
-exports.updatePassword = (req, res) => {
+exports.updatePassword = (req, res, next) => {
 	const update = () => {
 		const cpassword = crypto.createHash('sha512').update(req.body.changePassword).digest('base64')
 		return User.updateOne({ _id: res.locals._id }, { password: cpassword }).exec()
@@ -682,12 +675,13 @@ exports.updatePassword = (req, res) => {
 	const send = (r) => {
 		return res.status(200).json({ result: true })
 	}
-	try {
-		update().then(send)
-	} catch (err) {
-		console.error(err)
-		return res.status(500).json({ error: err.message })
+	
+	if (req.body.chagnePassword == "") {
+		res.status(400)
+		throw new Error("1")
 	}
+	update().then(send)
+	
 }
 /**
  * @api {delete} /api/v1/auth/local Request to delete user
@@ -708,13 +702,16 @@ exports.updatePassword = (req, res) => {
  *		"error": "Token Expired"
  *	}
  */
-exports.deleteUser = (req, res) => {
+exports.deleteUser = (req, res, next) => {
 	const getUser = (pw) => {
 		return User.findOne({ _id: res.locals._id, password: pw }).exec()
 	}
 	const delUser = (t) => {
 		if (t != null) return User.deleteOne({ _id: res.locals._id }).exec()
-		else return res.status(500).json({ error: "Not Found User" })
+		else {
+			res.status(500)
+			throw new Error("2")
+		}
 	}
 	const delExercise = (t) => {
 		return Exercise.deleteMany({ uid: res.locals._id }).exec()
@@ -734,16 +731,14 @@ exports.deleteUser = (req, res) => {
 	const send = (t) => {
 		return res.status(200).json({ result: true })
 	}
-	try {
-		if (req.body.password == "") {
-			return res.status(400).json({ error: "Data must not be null" })
-		}
-		const pw = crypto.createHash('sha512').update(req.body.password).digest('base64')
-		getUser(pw).then(delUser).then(delExercise).then(delMyFriend).then(delFriendOthers).then(send)
-	} catch (err) {
-		console.error(err)
-		return res.status(500).json({ error: err.message })
+	
+	if (req.body.password == "") {
+		res.status(400)
+		throw new Error("1")
 	}
+	const pw = crypto.createHash('sha512').update(req.body.password).digest('base64')
+	getUser(pw).then(delUser).then(delExercise).then(delMyFriend).then(delFriendOthers).then(send)
+	
 }
 
 

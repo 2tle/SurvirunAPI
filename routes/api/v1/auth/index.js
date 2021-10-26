@@ -2,6 +2,7 @@ const router = require('express').Router()
 const controller = require('./auth.controller.js')
 const authMiddleware = require('../../../../middlewares/authorization.js')
 const logMiddleware = require('../../../../middlewares/log.js')
+const errorMiddleware = require('../../../../middlewares/error.js')
 const multer = require('multer')
 const upload = multer({storage: multer.memoryStorage(),limits: { fileSize: 10 * 1024 * 1024 }})
 

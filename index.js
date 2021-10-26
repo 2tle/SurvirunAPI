@@ -4,6 +4,8 @@ const config = require('./config.js')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const logMiddleware = require('./middlewares/log')
+const errorMiddleware =require('./middlewares/error.js')
+const authMiddleware = require('./middlewares/authorization.js')
 const url = require('url')
 const timeout = require('express-timeout-handler')
 const moment = require('moment-timezone')
@@ -68,20 +70,14 @@ app.get('/',logMiddleware.consoleLog , (req, res) => {
 	res.status(200).json(d);
 });
 
-app.get('/easter',(req,res) => {
-	return res.status(200).json({
-		easter1: "7Lac66Cl7ISg67Cw6rCAIOyggOulvCDqtLTroa3tnpnri4jri6Qu",
-		easter2: "7J207KCV7J24IOyXv+ydtOuCmCDrk5zshLjsmpQ=",
-		easter3: ""
-	})
-})
 
-app.use('/api', require('./routes/api'));
 
+app.use('/api', require('./routes/api'))
+app.use(errorMiddleware.errorHandler)
 
 app.use(httpError.pageNotFoundError)
 //app.use(httpError.respondInternalError)
 const server = app.listen(config.port || 3000, () => {
-	console.log('server is now running');
+	console.log('server is now running')
 });
 

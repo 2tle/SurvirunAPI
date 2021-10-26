@@ -42,7 +42,7 @@ const crypto = require('crypto')
 			
  *	}
  */
-exports.getFriendsList = (req,res) => {
+exports.getFriendsList = (req,res,next) => {
 	const getList = () => {
 		return Friend.findOne({uid: res.locals._id}).exec()
 	}
@@ -95,7 +95,7 @@ exports.getFriendsList = (req,res) => {
 
 	
 
-exports.addFriend = (req,res) => {
+exports.addFriend = (req,res,next) => {
 
 	let anotherUid = "";
 
@@ -105,22 +105,26 @@ exports.addFriend = (req,res) => {
 			case "username":
 				if(!CheckModule.isEmpty(req.query.username)) 
 					return User.findOne({username: req.query.username}).exec()
-				else 
+				else {
+					res.status(400)
 					throw new Error("Data Must Not Be Null")
+				}
+					
 				break;
 			case "email":
-				console.log("just test pos1")
 			default:
 				if(!CheckModule.isEmpty(req.query.email)) 
 					return User.findOne({email: req.query.email}).exec()
-				else throw new Error("Data Must Not Be Null")
+				else {
+					res.status(400)
+					throw new Error("Data Must Not Be Null")
+				}
 				break;
 		}
 			
 	}
 	const addMyList = (another) => {
 		anotherUid = another._id;
-		console.log("just test pos2" + anotherUid)
 		return Friend.updateOne({
 			uid: res.locals._id
 		},{
@@ -141,15 +145,8 @@ exports.addFriend = (req,res) => {
 	const send = (data) => {
 		return res.status(200).json({result: true})
 	}
-	try {
-		//console.log("123"+req.query);
-		console.log("!231"+req.query.email);
-		
-		getAnotherUser().then(addMyList).then(addAnother).then(send)
-	}catch(err) {
-		console.error(err)
-		return res.status(500).json({error: err.message})
-	}
+	getAnotherUser().then(addMyList).then(addAnother).then(send)
+	
 }
 /**
  * @api {patch} /api/v1/friend Request to remove user's friend
@@ -172,7 +169,7 @@ exports.addFriend = (req,res) => {
  *		"error": "Token Expired"
  *	}
  */
-exports.removeFriend = (req, res) => {
+exports.removeFriend = (req,res,next) => {
 	let anotherUid = "";
 	
 	const getAnotherUser = () => {
@@ -180,13 +177,19 @@ exports.removeFriend = (req, res) => {
 			case "username":
 				if(!CheckModule.isEmpty(req.query.username)) 
 					return User.findOne({username: req.query.username}).exec()
-				else return res.status(400).json({error: "Data must not be null"})
+				else {
+					res.status(400)
+					throw new Error("Data Must Not Be Null")
+				}
 				break;
 			case "email":
 			default:
 				if(!CheckModule.isEmpty(req.query.email)) 
 					return User.findOne({email: req.query.email}).exec()
-				else return res.status(400).json({error: "Data must not be null"})
+				else {
+					res.status(400)
+					throw new Error("Data Must Not Be Null")
+				}
 				break;
 		}
 	}
@@ -213,10 +216,75 @@ exports.removeFriend = (req, res) => {
 	const send = (data) => {
 		return res.status(200).json({result: true})
 	}
-	try {
-		getAnotherUser().then(removeMyList).then(removeAnother).then(send)
-	}catch(err) {
-		console.error(err)
-		return res.status(500).json({error: err.message})
+	
+	getAnotherUser().then(removeMyList).then(removeAnother).then(send)
+	
+}
+
+/**
+ * @api {get} /api/v1/friend/check Request to check isFriend?
+ * @apiName GetIsFriend
+ * @apiGroup Friend
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiQuery {String} reqType email or username
+ * @apiQuery {String} username if you want to add friend as friend's username
+ * @apiQuery {String} email if you want to add friend as friend's email
+ * @apiSuccess {Boolean} result true or false
+ * @apiVersion 1.0.0
+ * @apiSuccessExample {json} Success:
+ *	HTTP/1.1 200 OK
+ * 	{
+		"result": true
 	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+ *		"error": "Token Expired"
+ *	}
+ */
+exports.isFriend = (req,res,next) => {
+	const getAnotherUser = () => {
+		switch(req.query.reqType) {
+			case "username":
+				if(CheckModule.isEmpty(req.query.username)) {
+					res.status(400)
+					throw new Error("1")
+				} else {
+					return User.findOne({username: req.query.username}).exec()
+				}
+				break;
+			case "email":
+			default:
+				if(CheckModule.isEmpty(req.query.email)) {
+					res.status(400)
+					throw new Error("1")
+				} else {
+					return User.findOne({email: req.query.email}).exec()
+				}
+				break;
+		}
+	}
+
+	const findFriend = (user) => {
+		if(!user) {
+			res.status(400)
+			throw new Error("2")
+		}
+		else return Friend.findOne({uid: user._id})
+	}
+
+	const isContain = (friend) => {
+		if(res.locals._id in friend.friends) {
+			return res.status(200).json({
+				result: true
+			})
+		}
+		else {
+			return res.status(200).json({
+				result: false
+			})
+		}
+	}
+
+	getAnotherUser().then(findFriend).then(isContain)
 }

@@ -8,15 +8,22 @@ exports.sendImg = (req,res) => {
 			case "profile":
 				if(!CheckModule.isEmpty(req.query.id))
 					return Profile.findOne({_id: req.query.id}).exec()
-				else return res.status(400).json({error: "Data must not be null"})
+				else {
+					res.status(400)
+					throw new Error("1")
+				}
 				break;
 			case "exercise":
 				if(!CheckModule.isEmpty(req.query.id))
 					return ExerciseImg.findOne({_id: req.query.id}).exec()
-				else return res.status(400).json({error: "Data must not be null"})
+				else {
+					res.status(400)
+					throw new Error("1")
+				}
 				break;
 			default:
-				return res.status(400).json({error: "Data must not be null"})
+				res.status(400)
+				throw new Error("1")
 				break;
 		}
 	}
@@ -26,11 +33,6 @@ exports.sendImg = (req,res) => {
 		return res.header('Content-Type','image/jpeg').status(200).send(data.img)
 
 	}
-
-	try {
-		typeToSendImg().then(bufToImg)
-	} catch(err) {
-		console.error(err)
-		return res.status(500).json({error: err.message})
-	}
+	typeToSendImg().then(bufToImg)
+	
 } 
