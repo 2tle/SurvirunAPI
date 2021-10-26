@@ -71,11 +71,10 @@ app.get('/',logMiddleware.consoleLog , (req, res) => {
 });
 
 
-
 app.use('/api', require('./routes/api'))
-app.use(errorMiddleware.errorHandler)
 
-app.use(httpError.pageNotFoundError)
+app.use(errorMiddleware.notFound)
+app.use(errorMiddleware.errorHandler)
 //app.use(httpError.respondInternalError)
 const server = app.listen(config.port || 3000, () => {
 	console.log('server is now running')

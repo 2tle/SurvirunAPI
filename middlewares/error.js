@@ -1,24 +1,40 @@
 const errorValue = {
-	0: "OtherError",
+	0: "OtherError", //various error
 	1: "Parameter must not be null",
 	2: "User is not found",
 	3: "Payload too large",
-	4: "Did not set profile image yet",	
-	5: "Token Expired",
-	6: "Not Logged In",
-	7: "Invaild Token"
-	
+	4: "Did not set profile image yet",
+	5: "Token expired",
+	6: "Not logged in",
+	7: "Invaild token",
+	8: "API not found"
+
+}
+
+exports.notFound = (req, res) => {
+	console.log(req.method, req.originalUrl)
+	res.status(404)
+	return res.json({
+		code: 8,
+		message: errorValue[8]
+	})
 }
 
 
-exports.errorHandler = (err, req,res,next) => {
-	console.error(err)
-	if(!res.statusCode) return res.status(500).json({
-		code: 0,
-		message: err.message
-	})
-	else return res.json({
-		code: parseInt(err.message),
-		message: errorValue[err.message]
-	})
+exports.errorHandler = (err, req, res, next) => {
+	console.log(req.method, req.originalUrl)
+	if (!res.statusCode) {
+		console.error(err.message)
+		return res.status(500).json({
+			code: 0,
+			message: err.message
+		})
+	}
+	else {
+		console.error(errorValue[err.message])
+		return res.json({
+			code: parseInt(err.message),
+			message: errorValue[err.message]
+		})
+	}
 }

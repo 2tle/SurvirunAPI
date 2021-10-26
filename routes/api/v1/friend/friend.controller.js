@@ -19,7 +19,8 @@ const crypto = require('crypto')
  * @apiErrorExample {json} Token Expired:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+	 	"code": 5,
+ *		"message": "Token Expired"
  *	}
  * @apiSuccessExample {json} Success, resType is username:
  *	HTTP/1.1 200 OK
@@ -89,7 +90,8 @@ exports.getFriendsList = (req,res,next) => {
  * @apiErrorExample {json} Token Expired:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+	 	"code" : 5,
+ *		"message": "Token Expired"
  *	}
  */
 
@@ -166,7 +168,8 @@ exports.addFriend = (req,res,next) => {
  * @apiErrorExample {json} Token Expired:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+	 	"code": 5
+ *		"message": "Token Expired"
  *	}
  */
 exports.removeFriend = (req,res,next) => {
