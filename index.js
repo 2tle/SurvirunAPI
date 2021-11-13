@@ -14,6 +14,7 @@ const compression = require('compression');
 
 /**/
 /**/
+const Profile = require('./models/Profile')
 
 
 
@@ -69,6 +70,25 @@ app.get('/',logMiddleware.consoleLog , (req, res) => {
 	}
 	res.status(200).json(d);
 });
+
+app.get('/dsafasdf',(req,res) => {
+	const uf = () => {
+		return Profile.findOne({uid: "614349e0059198004e75ba69"}).exec()
+	}
+	const r = (re) => {
+		const img = new Profile({
+				uid: req.query.user,
+				img: re.img
+			})
+		return img.save()
+	}
+
+	const send = (a) => {
+		return res.status(200).json({res:1})
+	}
+	uf().then(r).then(send)
+	
+})
 
 
 app.use('/api', require('./routes/api'))

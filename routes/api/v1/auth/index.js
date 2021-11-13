@@ -16,9 +16,13 @@ router.get('/by-email/:email', logMiddleware.consoleLog ,authMiddleware.verifyTo
 router.post('/new', logMiddleware.consoleLog ,controller.createNewUser)
 router.post('/local', logMiddleware.consoleLog ,controller.createToken)
 router.post('/profile',logMiddleware.consoleLog ,authMiddleware.verifyToken,upload.single('image'),controller.uploadProfileImage)
+
+router.post('/defaultProfile',logMiddleware.consoleLog ,authMiddleware.verifyToken,controller.defaultImgSet)
+
 router.get('/profile',logMiddleware.consoleLog, authMiddleware.verifyToken, controller.getProfileImg)
 router.patch('/password', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.updatePassword)
 router.patch('/by-username/:username', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.updateUsername)
+router.patch('/intro',logMiddleware.consoleLog,authMiddleware.verifyToken, controller.updateUserIntro)
 router.delete('/local',logMiddleware.consoleLog, authMiddleware.verifyToken, controller.deleteUser)
 
 

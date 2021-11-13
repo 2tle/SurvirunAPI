@@ -2,6 +2,7 @@ const User = require('../../../../models/user')
 const Posts = require('../../../../models/posts')
 const Exercise = require("../../../../models/Exercise")
 const ExerciseImage = require("../../../../models/ExerciseImg")
+const Score = require('../../../../models/Score')
 const config = require('../../../../config.js')
 const sharp = require("sharp");
 const jwt = require('jsonwebtoken')
@@ -250,6 +251,8 @@ exports.uploadMyExPhoto = (req, res, next)=> {
 }
 
 
+
+
 /**
  * @api {get} /api/v1/exercise/img Request to get exercise images
  * @apiName GetExerciseImages
@@ -320,6 +323,48 @@ exports.getImages = (req, res, next) => {
 
 	getData().then(send)
 	
+}
+
+
+
+
+/**
+ * @api {patch} /api/v1/exercise/score Request to patch user's score
+ * @apiName PatchScore
+ * @apiGroup Exercise
+ * @apiVersion 1.0.0
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiQuery {Number} score Your score 
+ * @apiSuccess {Number} score your the highest score
+ * @apiErrorExample {json} Something Error:
+ *	HTTP/1.1 500 Error
+ *	{ 
+	 	code: Number
+ * 		error: "Here is some Error Message" 
+ *	}
+ * @apiSuccessExample {json} Success:
+ *	HTTP/1.1 200 OK
+ *	{
+		"score": 150
+ *	}
+ */
+exports.patchScore = (req,res,next) => {
+	const patch = (score) => {
+		return Score.updateOne({uid: res.locals._id}, {$max: {score:score},$setOnInsert: {uid: res.locals._id}},{upsert: true}).exec()
+	}
+	const request = (t) => {
+		return Score.findOne({uid: res.locals._id}).exec()
+	}
+	const send = (result) => {
+		return res.status(200).json({score: result.score})
+	}
+	if(!req.query.score) {
+		res.status(400)
+		throw new Error("1")
+	}
+	else {
+		patch(req.query.score).then(request).then(send)
+	}
 }
 
 

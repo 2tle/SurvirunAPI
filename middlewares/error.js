@@ -7,12 +7,15 @@ const errorValue = {
 	5: "Token expired",
 	6: "Not logged in",
 	7: "Invaild token",
-	8: "API not found"
+	8: "API not found",
+	9: "Goal not found",
+	10: "Intro not found"
 
 }
 
 exports.notFound = (req, res) => {
-	console.log(req.method, req.originalUrl)
+	const ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress;
+	console.log(req.method, ip,req.originalUrl)
 	res.status(404)
 	return res.json({
 		code: 8,
@@ -22,7 +25,8 @@ exports.notFound = (req, res) => {
 
 
 exports.errorHandler = (err, req, res, next) => {
-	console.log(req.method, req.originalUrl)
+	const ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress;
+	console.log(req.method, ip,req.originalUrl)
 	if (!res.statusCode) {
 		console.error(err.message)
 		return res.status(500).json({

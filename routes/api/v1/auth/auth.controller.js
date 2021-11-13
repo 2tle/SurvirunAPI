@@ -2,7 +2,10 @@ const User = require('../../../../models/user')
 const Exercise = require('../../../../models/Exercise')
 const Friend = require('../../../../models/Friend')
 const Profile = require('../../../../models/Profile')
+const UserIntro = require('../../../../models/UserIntro')
 const CheckModule = require('../../../../module/check.js')
+const Score = require('../../../../models/Score')
+const fs = require('fs')
 const sharp = require("sharp");
 const config = require('../../../../config.js')
 const path = require('path')
@@ -30,6 +33,7 @@ const crypto = require('crypto')
  *	{
  *		"exists": true
  *	}
+ * 
  */
 exports.usernameExists = (req, res, next) => {
 
@@ -119,6 +123,8 @@ exports.emailExists = (req, res, next) => {
     	"_id": "3cda3912...",
     	"email": "test@test.com",
     	"username": "testUsername",
+		"intro": "this is my just 소개글.",
+		"score": 100,
 		"exerciseHistory": [
 			{
 				"calorie":10
@@ -136,6 +142,8 @@ exports.getUserByUsername = (req, res, next) => {
 	var email1 = ''
 	var username1 = ''
 	let imguid = ""
+	let intro = ""
+	var score = 0
 
 
 	const getUser = (username) => {
@@ -154,8 +162,26 @@ exports.getUserByUsername = (req, res, next) => {
 		id1 = user[0]._id
 		email1 = user[0].email
 		username1 = user[0].username
-		return Exercise.find({ uid: user[0]._id }, { _id: 0, uid: 0, __v: 0 }).sort({ "date": -1 }).limit(7).exec()
+		return Score.findOne({uid:id1}).exec()
+	}
 
+	const dP2 = (sco) => {
+		if(!sco) {
+			score = 0
+		} else {
+			score = sco.score
+		}
+		
+		return UserIntro.find({ uid: id1}).exec()
+	}
+
+	const getIntro = (introDq) => {
+		if(!introDq) {
+			intro = ""
+		} else {
+			intro =introDq.intro
+			return Exercise.find({ uid:id1}, { _id: 0, uid: 0, __v: 0 }).sort({ "date": 1 }).limit(7).exec()
+		}
 	}
 
 
@@ -164,6 +190,8 @@ exports.getUserByUsername = (req, res, next) => {
 			"_id": id1,
 			"email": email1,
 			"username": username1,
+			"intro": intro,
+			"score": score,
 			"exerciseHistory": d
 		}
 		return res.status(200).json(userJson)
@@ -176,7 +204,7 @@ exports.getUserByUsername = (req, res, next) => {
 		res.status(400)
 		throw new Error("1")
 	}
-	getUser(username).then(check).then(dataProcess).then(send)
+	getUser(username).then(check).then(dataProcess).then(dP2).then(getIntro).then(send)
 	
 }
 
@@ -210,6 +238,8 @@ exports.getUserByUsername = (req, res, next) => {
  * 		"_id": "3cda3912...",
     	"email": "test@test.com",
    		"username": "testUsername",
+		"intro": "this is my just 소개글.",
+		"score": 100,
 		"exerciseHistory": [
 			{
 				"calorie":10
@@ -226,6 +256,8 @@ exports.getUserByEmail = (req, res, next) => {
 	let email1 = ''
 	let username1 = ''
 	let imguid = ""
+	let intro = ""
+	var score= 0
 
 	const getUser = (email) => {
 		return User.find({ email: email }).exec()
@@ -243,8 +275,27 @@ exports.getUserByEmail = (req, res, next) => {
 		id1 = user[0]._id
 		email1 = user[0].email
 		username1 = user[0].username
-		return Exercise.find({ uid: user[0]._id }, { _id: 0, uid: 0, __v: 0 }).sort({ "date": -1 }).limit(7).exec()
+		return Score.findOne({uid:id1}).exec()
+	}
 
+	const dP2 = (sco) => {
+		if(!sco) {
+			score = 0
+		} else {
+			score = sco.score
+		}
+		return UserIntro.find({ uid: id1}).exec()
+	}
+
+	const getIntro = (introDq) => {
+		if(!introDq) {
+			//res.status(500)
+			//throw new Error("10")
+			intro = ""
+		} else {
+			intro =introDq.intro
+			return Exercise.find({ uid: id1 }, { _id: 0, uid: 0, __v: 0 }).sort({ "date": 1 }).limit(7).exec()
+		}
 	}
 
 
@@ -253,6 +304,8 @@ exports.getUserByEmail = (req, res, next) => {
 			"_id": id1,
 			"email": email1,
 			"username": username1,
+			"intro": intro,
+			"score": score,
 			"exerciseHistory": d
 		}
 		return res.status(200).json(userJson)
@@ -265,7 +318,7 @@ exports.getUserByEmail = (req, res, next) => {
 		res.status(400)
 		throw new Error("1")
 	}
-	getUser(email).then(check).then(dataProcess).then(send)
+	getUser(email).then(check).then(dataProcess).then(dP2).then(getIntro).then(send)
 	
 	
 }
@@ -452,6 +505,19 @@ exports.uploadProfileImage = (req, res, next) => {
 
 	let imgbuffer;
 
+	const zip = () => {
+		//let t = fs.readFileSync('./defaultUserImg.png')
+		return sharp('d.PNG')
+			.withMetadata()	// 이미지의 exif데이터 유지
+			.png({
+				quality: 80,
+
+			})
+			.toBuffer().then((data) => {
+				imgbuffer = data;
+			})
+	}
+
 	const zip1 = () => {
 		return sharp(req.file.buffer)
 			.withMetadata()	// 이미지의 exif데이터 유지
@@ -468,11 +534,8 @@ exports.uploadProfileImage = (req, res, next) => {
 	}
 
 	const uploadImg = (findOne) => {
-		const imgbuffer = req.file.buffer;
-		if (imgbuffer.truncated) {
-			res.status(413)
-			throw new Error("3")
-		}
+		
+		
 		if (!findOne) {
 			const img = new Profile({
 				uid: res.locals._id,
@@ -489,16 +552,89 @@ exports.uploadProfileImage = (req, res, next) => {
 	const send = (t) => {
 		return res.status(200).json({ result: true })
 	}
-
-
-	if (!req.file.buffer) {
-		res.status(400)
-		throw new Error("1")
+	if(!req.query.reqType && req.query.reqType=="image") {
+		if (!req.file.buffer) {
+			res.status(400)
+			throw new Error("1")
+		}
+		zip1()
+		findOne().then(uploadImg).then(send)
+	} else {
+		zip()
+		findOne().then(uploadImg).then(send)
 	}
-	zip1()
-	findOne().then(uploadImg).then(send)
-	
 }
+
+/**
+ * @api {post} /api/v1/auth/defaultProfile Request to update user's profile as DEFAULT IMAGE
+ * @apiName SETProfileImageAsDefault
+ * @apiDescription ..
+ * @apiGroup User
+ * @apiVersion 1.0.0
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiSuccess {Boolean} result true
+ * @apiErrorExample {json} Something Error:
+ *	HTTP/1.1 500 Internal Server Error
+ *	{ 
+ * 		error: "something error msg" 
+ *	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+ *		"error": "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} Success:
+ *	HTTP/1.1 200 OK
+ *	{
+		"result" : true
+ *	}
+ */
+exports.defaultImgSet = (req,res,next) => {
+	let imgbuffer;
+
+	const zip = () => {
+		//let t = fs.readFileSync('./defaultUserImg.png')
+		return sharp('./images/defaultUserImg.png')
+			.withMetadata()	// 이미지의 exif데이터 유지
+			.png({
+				quality: 80,
+
+			})
+			.toBuffer().then((data) => {
+				imgbuffer = data;
+			})
+	}
+
+	const findOne = () => {
+		return Profile.findOne({ uid: res.locals._id }).exec()
+	}
+
+	const send= (t) => {
+		return res.status(200).json({result:true})
+	}
+
+	const uploadImg = (findOne) => {
+		
+		if (!findOne) {
+			const img = new Profile({
+				uid: res.locals._id,
+				img: imgbuffer
+			})
+			return img.save()
+		} else {
+			return Profile.updateOne({ uid: res.locals._id }, { img: imgbuffer }).exec()
+		}
+
+		
+
+
+	}
+
+	zip()
+	findOne().then(uploadImg).then(send)
+}
+
+
 
 /**
  * @api {get} /api/v1/auth/profile Request to get user's profile image
@@ -739,6 +875,41 @@ exports.deleteUser = (req, res, next) => {
 	const pw = crypto.createHash('sha512').update(req.body.password).digest('base64')
 	getUser(pw).then(delUser).then(delExercise).then(delMyFriend).then(delFriendOthers).then(send)
 	
+}
+
+/**
+ * @api {patch} /api/v1/auth/intro Request to patch my intro
+ * @apiName PatchUserIntro
+ * @apiGroup User
+ * @apiVersion 1.0.0
+ * @apiHeader {String} x-access-token user's jwt token
+ * @apiBody {String} intro user's intro
+ * @apiSuccess {Boolean} result true or false
+ * @apiSuccessExample {json} Success:
+ *	HTTP/1.1 200 OK
+ * 	{
+		"result": true
+	}
+ * @apiErrorExample {json} Token Expired:
+ *	HTTP/1.1 419
+ *	{
+	 	"code": 5
+ *		"message": "Token Expired"
+ *	}
+ */
+exports.updateUserIntro = (req,res,next) => {
+	const updateQ = (intro) => {
+		return UserIntro.updateOne({uid:res.locals._id},{uid: res.locals._id, intro: intro},{upsert:true})
+	}
+
+	const send = (t) => {
+		return res.status(200).json({result:true})
+	}
+	if(CheckModule.isEmpty(req.query.intro)) {
+		res.status(400)
+		throw new Error("1")
+	}
+	updateQ(req.body.intro).then(send)
 }
 
 

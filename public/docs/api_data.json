@@ -423,6 +423,242 @@
   },
   {
     "type": "get",
+    "url": "/api/v1/goal/compare",
+    "title": "Request to get (currentValue / goal)",
+    "name": "GetGoalRatio",
+    "group": "Exercise/Goal",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "calorie",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "time",
+            "description": ""
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"calorie\": 0.32313\n\t\"km\": 1.311,\n\t\"time\": 0.91111\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Not Found email:",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/goal/goal.controller.js",
+    "groupTitle": "Exercise/Goal"
+  },
+  {
+    "type": "get",
+    "url": "/api/v1/goal",
+    "title": "Request to get My Goal",
+    "name": "GetMyGoal",
+    "group": "Exercise/Goal",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "calorie",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "time",
+            "description": ""
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"calorie\": 3241,\n\t\"km\": 5.311,\n\t\"time\": 1231,\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Not Found email:",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/goal/goal.controller.js",
+    "groupTitle": "Exercise/Goal"
+  },
+  {
+    "type": "patch",
+    "url": "/api/v1/goal",
+    "title": "Request to patch(update) My Goal",
+    "name": "PatchMyGoal",
+    "group": "Exercise/Goal",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "calorie",
+        "description": "<p>user's goal exercise: calorie</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "km",
+        "description": "<p>user's goal exercise: running km</p>"
+      },
+      {
+        "group": "Body",
+        "type": "Number",
+        "optional": false,
+        "field": "time",
+        "description": "<p>user's goal exercise: time (sec)</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "calorie",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "km",
+            "description": ""
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "time",
+            "description": ""
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"calorie\": 3241,\n\t\"km\": 5.311,\n\t\"time\": 1231,\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Not Found email:",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/goal/goal.controller.js",
+    "groupTitle": "Exercise/Goal"
+  },
+  {
+    "type": "get",
     "url": "/api/v1/exercise/img",
     "title": "Request to get exercise images",
     "name": "GetExerciseImages",
@@ -627,6 +863,67 @@
         {
           "title": "Token Expired:",
           "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/exercise/exercise.controller.js",
+    "groupTitle": "Exercise"
+  },
+  {
+    "type": "patch",
+    "url": "/api/v1/exercise/score",
+    "title": "Request to patch user's score",
+    "name": "PatchScore",
+    "group": "Exercise",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "query": [
+      {
+        "group": "Query",
+        "type": "Number",
+        "optional": false,
+        "field": "score",
+        "description": "<p>Your score</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "score",
+            "description": "<p>your the highest score</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"score\": 150\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Something Error:",
+          "content": "HTTP/1.1 500 Error\n{ \n \tcode: Number\n\terror: \"Here is some Error Message\" \n}",
           "type": "json"
         }
       ]
@@ -869,7 +1166,7 @@
       "examples": [
         {
           "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "content": "HTTP/1.1 419\n{\n \t\"code\" : 5,\n\t\"message\": \"Token Expired\"\n}",
           "type": "json"
         }
       ]
@@ -935,7 +1232,7 @@
       "examples": [
         {
           "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "content": "HTTP/1.1 419\n{\n \t\"code\": 5,\n\t\"message\": \"Token Expired\"\n}",
           "type": "json"
         }
       ]
@@ -1085,7 +1382,7 @@
       "examples": [
         {
           "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "content": "HTTP/1.1 419\n{\n \t\"code\": 5\n\t\"message\": \"Token Expired\"\n}",
           "type": "json"
         }
       ]
@@ -1329,7 +1626,7 @@
       "examples": [
         {
           "title": "Success:",
-          "content": "\tHTTP/1.1 200 OK\n\t{\n\t\t\"_id\": \"3cda3912...\",\n    \t\"email\": \"test@test.com\",\n   \t\t\"username\": \"testUsername\",\n\t\t\"exerciseHistory\": [\n\t\t\t{\n\t\t\t\t\"calorie\":10\n\t\t\t\t\"km\":0.045,\n\t\t\t\t\"time\": 4312,\n\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t},\n\t\t\t...\n\t\t]\n\t}",
+          "content": "\tHTTP/1.1 200 OK\n\t{\n\t\t\"_id\": \"3cda3912...\",\n    \t\"email\": \"test@test.com\",\n   \t\t\"username\": \"testUsername\",\n\t\t\"intro\": \"this is my just 소개글.\",\n\t\t\"score\": 100,\n\t\t\"exerciseHistory\": [\n\t\t\t{\n\t\t\t\t\"calorie\":10\n\t\t\t\t\"km\":0.045,\n\t\t\t\t\"time\": 4312,\n\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t},\n\t\t\t...\n\t\t]\n\t}",
           "type": "json"
         }
       ]
@@ -1399,7 +1696,7 @@
       "examples": [
         {
           "title": "Success:",
-          "content": "\tHTTP/1.1 200 OK\n\t{\n  \n    \t\"_id\": \"3cda3912...\",\n    \t\"email\": \"test@test.com\",\n    \t\"username\": \"testUsername\",\n\t\t\"exerciseHistory\": [\n\t\t\t{\n\t\t\t\t\"calorie\":10\n\t\t\t\t\"km\":0.045,\n\t\t\t\t\"time\": 4312,\n\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t},\n\t\t\t...\n\t\t]\n\t}",
+          "content": "\tHTTP/1.1 200 OK\n\t{\n  \n    \t\"_id\": \"3cda3912...\",\n    \t\"email\": \"test@test.com\",\n    \t\"username\": \"testUsername\",\n\t\t\"intro\": \"this is my just 소개글.\",\n\t\t\"score\": 100,\n\t\t\"exerciseHistory\": [\n\t\t\t{\n\t\t\t\t\"calorie\":10\n\t\t\t\t\"km\":0.045,\n\t\t\t\t\"time\": 4312,\n\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t},\n\t\t\t...\n\t\t]\n\t}",
           "type": "json"
         }
       ]
@@ -1409,6 +1706,125 @@
         {
           "title": "Not Found username:",
           "content": "HTTP/1.1 404 Not Found\n{\n\tuser: null\n}",
+          "type": "json"
+        },
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "patch",
+    "url": "/api/v1/auth/intro",
+    "title": "Request to patch my intro",
+    "name": "PatchUserIntro",
+    "group": "User",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "intro",
+        "description": "<p>user's intro</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>true or false</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Token Expired:",
+          "content": "HTTP/1.1 419\n{\n \t\"code\": 5\n\t\"message\": \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "User"
+  },
+  {
+    "type": "post",
+    "url": "/api/v1/auth/defaultProfile",
+    "title": "Request to update user's profile as DEFAULT IMAGE",
+    "name": "SETProfileImageAsDefault",
+    "description": "<p>..</p>",
+    "group": "User",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>user's jwt token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>true</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success:",
+          "content": "HTTP/1.1 200 OK\n{\n\t\"result\" : true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Something Error:",
+          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
           "type": "json"
         },
         {

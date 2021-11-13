@@ -1,5 +1,6 @@
 const User = require('../../../../models/user')
 const Friend = require("../../../../models/Friend")
+const Profile = require('../../../../models/Profile')
 const CheckModule = require('../../../../module/check.js')
 const config = require('../../../../config.js')
 const jwt = require('jsonwebtoken')
@@ -49,6 +50,7 @@ exports.getFriendsList = (req,res,next) => {
 	}
 	
 	const getUserList = (listdata) => {
+		//console.log(req)
 		switch(req.query.resType) {
 			case "username":
 				return User.find({_id: {'$in' : listdata.friends}},{_id:0,__v:0,email:0,password:0}).exec()
@@ -65,13 +67,45 @@ exports.getFriendsList = (req,res,next) => {
 			friends: listArr
 		})
 	}
-	try {
-		getList().then(getUserList).then(send)
-	} catch(err) {
-		//console.error(err)
-		return res.status(500).json({error: err.message})
-	}
+	
+	getList().then(getUserList).then(send)
+	
 }
+
+exports.getFriendListRoom = (req,res,next) => {
+	let frList;
+	let proList;
+	const getList = () => {
+		return Friend.findOne({uid: res.locals._id}).exec()
+	}
+	const getProfileList = (listdata) => {
+		frList = listdata.friends
+		return Profile.find({uid: {'$in' : frList}},{_id: 1}).exec()
+	}
+	const getUserList = (listdata) => {
+		proList = listdata
+
+		return User.find({_id: {'$in' : frList}},{_id:0,email:1, username:1}).exec()
+		
+	}
+
+	const send = (user) => {
+		return res.status(200).json({
+			users: user,
+			profiles: proList
+		})
+	}
+
+	getList().then(getProfileList).then(getUserList).then(send)
+
+	
+
+}
+
+
+
+
+
 /**
  * @api {post} /api/v1/friend Request to add user's friend
  * @apiName AddFriendList
@@ -97,12 +131,12 @@ exports.getFriendsList = (req,res,next) => {
 
 	
 
-exports.addFriend = (req,res,next) => {
+exports.addFriend = (req,res) => {
 
 	let anotherUid = "";
 
 	const getAnotherUser = () => {
-		console.log(req.query.reqType)
+		//console.log(req.query.reqType)
 		switch(req.query.reqType) {
 			case "username":
 				if(!CheckModule.isEmpty(req.query.username)) 

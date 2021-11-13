@@ -1,6 +1,9 @@
 exports.consoleLog = (req,res,next) => {
   try {
-    console.log(req.method,req.originalUrl)
+	const ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress;
+
+
+    console.log(req.method,ip,req.originalUrl)
     next()
   } catch(err) {
     console.error(err)
