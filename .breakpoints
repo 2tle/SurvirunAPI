@@ -4,22 +4,22 @@
       {
         "id": "13380b37-1eac-4614-a570-dc573e9ee06b",
         "line": 62,
-        "version": 17331,
+        "version": 17370,
         "index": 1707
       },
       {
         "id": "c8f2e53b-ba27-43aa-89a2-b80ea2fb62e6",
         "line": 914,
-        "version": 17331,
+        "version": 17370,
         "index": 20441
       }
     ],
     "routes/api/v1/friend/friend.controller.js": [
       {
         "id": "bdb8d729-f633-476d-b73d-b2d6a2c89fc8",
-        "line": 18,
-        "version": 7939,
-        "index": 628
+        "line": 19,
+        "version": 9321,
+        "index": 621
       }
     ]
   }

@@ -14,7 +14,7 @@ const errorValue = {
 }
 
 exports.notFound = (req, res) => {
-	const ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress;
+	const ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress
 	console.log(req.method, ip,req.originalUrl)
 	res.status(404)
 	return res.json({
@@ -25,7 +25,7 @@ exports.notFound = (req, res) => {
 
 
 exports.errorHandler = (err, req, res, next) => {
-	const ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress;
+	const ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress
 	console.log(req.method, ip,req.originalUrl)
 	if (!res.statusCode) {
 		console.error(err.message)

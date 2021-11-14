@@ -10,33 +10,33 @@ const crypto = require('crypto')
 
 
 /**
- * @api {get} /api/v1/friend/list Request to get user's friend list
+ * @api {get} /api/v1/friend/list 사용자의 친구 목록 가져오기
  * @apiName GetFriendList
- * @apiGroup Friend
+ * @apiGroup 친구
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiQuery {String} resType responseType: email or username, default is email
- * @apiSuccess {List} friends friends list
- * @apiErrorExample {json} Token Expired:
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiQuery {String} resType 반환타입 지정: email 또는 username
+ * @apiSuccess {List} friends 친구리스트
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
-	 	"code": 5,
- *		"message": "Token Expired"
- *	}
- * @apiSuccessExample {json} Success, resType is username:
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} 성공, username 반환타입:
  *	HTTP/1.1 200 OK
  *	{
- *		"friends": [
+ *		friends: [
  *			{username: "Lux"},
  * 			{username: "Ashe"},
  * 			...
  *		]
 			
  *	}
- * @apiSuccessExample {json} Success, resType is email:
+ * @apiSuccessExample {json} 성공, email 반환타입:
  *	HTTP/1.1 200 OK
  *	{
- *		"friends": [
+ *		friends: [
  *			{email: "java@isnotgood.com"},
  * 			{email: "kotlin@isbest.io"},
  * 			...
@@ -50,7 +50,6 @@ exports.getFriendsList = (req,res,next) => {
 	}
 	
 	const getUserList = (listdata) => {
-		//console.log(req)
 		switch(req.query.resType) {
 			case "username":
 				return User.find({_id: {'$in' : listdata.friends}},{_id:0,__v:0,email:0,password:0}).exec()
@@ -67,11 +66,39 @@ exports.getFriendsList = (req,res,next) => {
 			friends: listArr
 		})
 	}
+	try {
+		getList().then(getUserList).then(send)
+	} catch(e) {
+		throw new Error(e.message)
+	}
 	
-	getList().then(getUserList).then(send)
 	
 }
-
+/**
+ * @api {get} /api/v1/friend/roomList 사용자의 룸 전용 친구 목록 가져오기
+ * @apiName GetFriendListRoom
+ * @apiGroup 친구
+ * @apiVersion 1.0.0
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiSuccess {List} users 친구들의 이메일 및 이름 리스트
+ * @apiSuccess {List} profiles 친구들의 프로필 사진의 고유값 리슽트
+ * @apiErrorExample {json} 토큰 만료:
+ *	HTTP/1.1 419
+ *	{
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} 성공:
+ *	HTTP/1.1 200 OK
+ *	{
+ *		users: [
+ *	 		{email: "someone@example.com", username: "Ashe"},
+ *  	],
+ * 		profiles: [
+ * 			{_id: "profileUid1"},
+ * 		]
+ *	}
+ */
 exports.getFriendListRoom = (req,res,next) => {
 	let frList;
 	let proList;
@@ -95,11 +122,11 @@ exports.getFriendListRoom = (req,res,next) => {
 			profiles: proList
 		})
 	}
-
-	getList().then(getProfileList).then(getUserList).then(send)
-
-	
-
+	try {
+		getList().then(getProfileList).then(getUserList).then(send)
+	} catch(e) {
+		throw new Error(e.message)
+	}
 }
 
 
@@ -107,26 +134,26 @@ exports.getFriendListRoom = (req,res,next) => {
 
 
 /**
- * @api {post} /api/v1/friend Request to add user's friend
+ * @api {post} /api/v1/friend 친구추가
  * @apiName AddFriendList
- * @apiGroup Friend
- * @apiHeader {String} x-access-token user's jwt token
- * @apiQuery {String} reqType email or username
- * @apiQuery {String} username if you want to add friend as friend's username
- * @apiQuery {String} email if you want to add friend as friend's email
+ * @apiGroup 친구
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiQuery {String} reqType 요청타입 email 또는 username
+ * @apiQuery {String} username (옵션) 요청타입이 username인 경우 추가할 상대의 닉네임 
+ * @apiQuery {String} email (옵션) 요청타입이 email인 경우 추가할 상대의 이메일
  * @apiVersion 1.0.0
- * @apiSuccess {Boolean} result true or false
- * @apiSuccessExample {json} Success:
+ * @apiSuccess {Boolean} result 결과 true 또는 false
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  * 	{
 		"result": true
 	}
- * @apiErrorExample {json} Token Expired:
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
-	 	"code" : 5,
- *		"message": "Token Expired"
- *	}
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
  */
 
 	
@@ -136,14 +163,13 @@ exports.addFriend = (req,res) => {
 	let anotherUid = "";
 
 	const getAnotherUser = () => {
-		//console.log(req.query.reqType)
 		switch(req.query.reqType) {
 			case "username":
 				if(!CheckModule.isEmpty(req.query.username)) 
 					return User.findOne({username: req.query.username}).exec()
 				else {
 					res.status(400)
-					throw new Error("Data Must Not Be Null")
+					throw new Error("1")
 				}
 					
 				break;
@@ -153,7 +179,7 @@ exports.addFriend = (req,res) => {
 					return User.findOne({email: req.query.email}).exec()
 				else {
 					res.status(400)
-					throw new Error("Data Must Not Be Null")
+					throw new Error("1")
 				}
 				break;
 		}
@@ -181,30 +207,35 @@ exports.addFriend = (req,res) => {
 	const send = (data) => {
 		return res.status(200).json({result: true})
 	}
-	getAnotherUser().then(addMyList).then(addAnother).then(send)
+	try {
+		getAnotherUser().then(addMyList).then(addAnother).then(send)
+	} catch(e) {
+		throw new Error(e.message)
+	}
+	
 	
 }
 /**
- * @api {patch} /api/v1/friend Request to remove user's friend
+ * @api {patch} /api/v1/friend 친구삭제
  * @apiName RemoveFriendList
- * @apiGroup Friend
- * @apiHeader {String} x-access-token user's jwt token
- * @apiQuery {String} reqType email or username
- * @apiQuery {String} username if you want to add friend as friend's username
- * @apiQuery {String} email if you want to add friend as friend's email
- * @apiSuccess {Boolean} result true or false
+ * @apiGroup 친구
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiQuery {String} reqType 요청타입 email 또는 username
+ * @apiQuery {String} username (옵션) 요청타입이 username인 경우 추가할 상대의 닉네임 
+ * @apiQuery {String} email (옵션) 요청타입이 email인 경우 추가할 상대의 이메일
  * @apiVersion 1.0.0
- * @apiSuccessExample {json} Success:
+ * @apiSuccess {Boolean} result 결과 true 또는 false
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  * 	{
 		"result": true
 	}
- * @apiErrorExample {json} Token Expired:
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
-	 	"code": 5
- *		"message": "Token Expired"
- *	}
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
  */
 exports.removeFriend = (req,res,next) => {
 	let anotherUid = "";
@@ -216,7 +247,7 @@ exports.removeFriend = (req,res,next) => {
 					return User.findOne({username: req.query.username}).exec()
 				else {
 					res.status(400)
-					throw new Error("Data Must Not Be Null")
+					throw new Error("1")
 				}
 				break;
 			case "email":
@@ -225,7 +256,7 @@ exports.removeFriend = (req,res,next) => {
 					return User.findOne({email: req.query.email}).exec()
 				else {
 					res.status(400)
-					throw new Error("Data Must Not Be Null")
+					throw new Error("1")
 				}
 				break;
 		}
@@ -254,30 +285,36 @@ exports.removeFriend = (req,res,next) => {
 		return res.status(200).json({result: true})
 	}
 	
-	getAnotherUser().then(removeMyList).then(removeAnother).then(send)
+	try {
+		getAnotherUser().then(removeMyList).then(removeAnother).then(send)
+	} catch(e) {
+		throw new Error(e.message)
+	}
+	
 	
 }
 
 /**
- * @api {get} /api/v1/friend/check Request to check isFriend?
+ * @api {get} /api/v1/friend/check 친구여부 확인
  * @apiName GetIsFriend
- * @apiGroup Friend
- * @apiHeader {String} x-access-token user's jwt token
- * @apiQuery {String} reqType email or username
- * @apiQuery {String} username if you want to add friend as friend's username
- * @apiQuery {String} email if you want to add friend as friend's email
- * @apiSuccess {Boolean} result true or false
+ * @apiGroup 친구
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiQuery {String} reqType 요청타입 email 또는 username
+ * @apiQuery {String} username (옵션) 요청타입이 username인 경우 추가할 상대의 닉네임 
+ * @apiQuery {String} email (옵션) 요청타입이 email인 경우 추가할 상대의 이메일
  * @apiVersion 1.0.0
+ * @apiSuccess {Boolean} result 결과 true 또는 false
  * @apiSuccessExample {json} Success:
  *	HTTP/1.1 200 OK
  * 	{
 		"result": true
 	}
- * @apiErrorExample {json} Token Expired:
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
- *	}
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
  */
 exports.isFriend = (req,res,next) => {
 	const getAnotherUser = () => {
@@ -322,6 +359,10 @@ exports.isFriend = (req,res,next) => {
 			})
 		}
 	}
-
-	getAnotherUser().then(findFriend).then(isContain)
+	try {
+		getAnotherUser().then(findFriend).then(isContain)
+	} catch(e) {
+		throw new Error(e.message)
+	}
+	
 }

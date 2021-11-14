@@ -2,16 +2,16 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const ExerciseImg = new Schema({
   uid: {
-	  type: String
+	  type: String,
   },
   date: {
-	  type: String
+	  type: String,
   },
   time: {
-	  type: String
+	  type: String,
   },
   img: { //must convert from bytearray to string(base64)
-	  type: Buffer
+	  type: Buffer,
   },
 })
 module.exports = mongoose.model("ExerciseImg",ExerciseImg)

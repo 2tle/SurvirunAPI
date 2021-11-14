@@ -14,32 +14,28 @@ const upload = {
 }
 
 /**
- * @api {get} /api/v1/exercise Request to get today exercise data
+ * @api {get} /api/v1/exercise 오늘의 운동 데이터 가져오기
  * @apiName GetTodayExercise
- * @apiGroup Exercise
+ * @apiGroup 운동
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiSuccess {String} date user's today exercise
- * @apiSuccess {Number} calorie user's today exercise: calorie
- * @apiSuccess {Number} km user's today exercise: running km
- * @apiSuccess {Number} time user's today exercise: time (second)
- * @apiErrorExample {json} Not Found email:
- *	HTTP/1.1 500 Internal Server Error
- *	{ 
- * 		error: "something error msg" 
- *	}
- * @apiErrorExample {json} Token Expired:
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiSuccess {String} date 오늘 날짜
+ * @apiSuccess {Number} calorie 사용자의 소모한 칼로리
+ * @apiSuccess {Number} km 사용자의 달린 거리
+ * @apiSuccess {Number} time 사용자의 달린 시간(초)
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+	 	code: 5
+ *		error: "Token Expired"
  * 	}
- * @apiSuccessExample {json} Success:
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  *	{
-		"calorie":10
-		"km":0.045,
-		"time": 4312,
-		"date":"2021-09-13"	
+		calorie:10
+		km:0.045,
+		time: 4312,
+		date:"2021-09-13"	
  *	}
  */
 exports.getExerciseData = (req, res, next) => { //today
@@ -54,7 +50,7 @@ exports.getExerciseData = (req, res, next) => { //today
 		else {
 			const exercise = new Exercise({ uid: res.locals._id, calorie: 0, km: 0, time: 0, date: currentTimeToStr })
 			exercise.save()
-			res.status(200).json({
+			return res.status(200).json({
 				"calorie": 0,
 				"km": 0,
 				"time": 0,
@@ -62,42 +58,41 @@ exports.getExerciseData = (req, res, next) => { //today
 			})
 		}
 	}
-
+	try {
+		getData().then(send)
+	} catch(e) {
+		throw new Error(e.message)
+	}
 	
-	getData().then(send)
 	
 
 }
 /**
- * @api {patch} /api/v1/exercise Request to update User's Exercise data
+ * @api {patch} /api/v1/exercise 운동 데이터 업데이트
  * @apiName UpdateTodayExercise
- * @apiGroup Exercise
- * @apiHeader {String} x-access-token user's jwt token
- * @apiBody {Number} calorie user's today exercise: calorie
- * @apiBody {Number} km user's today exercise: running km
- * @apiBody {Number} time user's today exercise: time (second)
- * @apiSuccess {String} date user's today exercise
- * @apiSuccess {Number} calorie user's today exercise: calorie
- * @apiSuccess {Number} km user's today exercise: running km
- * @apiSuccess {Number} time user's today exercise: time (second)
+ * @apiGroup 운동
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiBody {Number} calorie 사용자의 소모한 칼로리
+ * @apiBody {Number} km 사용자의 달린 거리
+ * @apiBody {Number} time 사용자의 달린 시간(초)
+ * @apiSuccess {String} date 오늘 날짜
+ * @apiSuccess {Number} calorie 사용자의 오늘 소모한 칼로리
+ * @apiSuccess {Number} km 사용자의 오늘 달린 거리
+ * @apiSuccess {Number} time 사용자의 오늘 달린 시간(초)
  * @apiVersion 1.0.0
- * @apiErrorExample {json} Not Found email:
- *	HTTP/1.1 500 Internal Server Error
- * 	{ 
- *		error: "something error msg" 
- *	}
- * @apiErrorExample {json} Token Expired:
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
- * 	{
- *		"error": "Token Expired"
- *	}
- * @apiSuccessExample {json} Success:
+ *	{
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  *	{
-		"calorie":10
-		"km":0.045,
-		"time": 4312,
-		"date":"2021-09-13"	
+		calorie:10
+		km:0.045,
+		time: 4312,
+		date:"2021-09-13"	
  *	}
  */
 exports.updateExerciseData = (req, res, next) => {
@@ -124,42 +119,43 @@ exports.updateExerciseData = (req, res, next) => {
 		return res.status(200).json(ex)
 	}
 
-	update().then(check).then(tct).then(send)
+	try {
+		update().then(check).then(tct).then(send)
+	} catch(e) {
+		throw new Exception(e.message)
+	}
+	
 	
 }
 
 /**
- * @api {get} /api/v1/exercise/list Request to get exercise data before 7days
+ * @api {get} /api/v1/exercise/list 최대 1주일 까지의 운동 기록 가져오기
  * @apiName GetExerciseList
- * @apiGroup Exercise
+ * @apiGroup 운동
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiSuccess {List} exerciseHistory user's today exercise
- * @apiErrorExample {json} Not Found email:
- *	HTTP/1.1 500 Internal Server Error
- *	{ 
- * 		error: "something error msg" 
- *	}
- * @apiErrorExample {json} Token Expired:
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiSuccess {List} exerciseHistory 운동기록 리스트
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+	 	code: 5
+ *		error: "Token Expired"
  * 	}
- * @apiSuccessExample {json} Success:
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  *	{
-		"exerciseHistory": [
+		exerciseHistory: [
 			{
-				"calorie":10
-				"km":0.045,
-				"time": 4312,
-				"date":"2021-09-13"	
+				calorie:10
+				km:0.045,
+				time: 4312,
+				date:"2021-09-13"	
 			},
 			{
-				"calorie":10
-				"km":0.045,
-				"time": 4312,
-				"date":"2021-09-12"	
+				calorie:10
+				km:0.045,
+				time: 4312,
+				date:"2021-09-12"	
 			},
 			...
 		]
@@ -173,31 +169,31 @@ exports.getExerList = (req, res, next)=> {
 	const send = (d) => {
 		return res.status(200).json({exerciseHistory: d})
 	}
-
-	getData().then(send)
+	try {
+		getData().then(send)
+	} catch(e) {
+		throw new Error(e.message)
+	}
+	
 	
 } 
 
 /**
- * @api {post} /api/v1/exercise/img Request to upload exercise image
+ * @api {post} /api/v1/exercise/img 운동 이미지 업로드
  * @apiName UploadExerciseImage
- * @apiDescription Must USE Header :: Content-Type :  multipart/form-data
- * @apiGroup Exercise
+ * @apiGroup 운동
  * @apiVersion 1.0.0
  * @apiBody {File} image Image File
- * @apiHeader {String} x-access-token user's jwt token
- * @apiSuccess {Boolean} result true
- * @apiErrorExample {json} Something Error:
- *	HTTP/1.1 500 Internal Server Error
- *	{ 
- * 		error: "something error msg" 
- *	}
- * @apiErrorExample {json} Token Expired:
+ * @apiHeader {String} Content-Type multipart/form-data
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiSuccess {Boolean} result 결과 true 또는 false
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+	 	code: 5
+ *		error: "Token Expired"
  * 	}
- * @apiSuccessExample {json} Success:
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  *	{
 		"result" : true
@@ -241,12 +237,18 @@ exports.uploadMyExPhoto = (req, res, next)=> {
 		return res.status(200).json({result: true})
 	}
 
-	if(req.file.buffer == "") {
-		res.status(400)
-		throw new Error("1")
+	try {
+		if(req.file.buffer == "") {
+			res.status(400)
+			throw new Error("1")
+		}	
+		zip1();
+		uploadImg().then(send)
+	} catch(e) {
+		throw new Error(e.message)
 	}
-	zip1();
-	uploadImg().then(send)
+
+	
 	
 }
 
@@ -254,32 +256,28 @@ exports.uploadMyExPhoto = (req, res, next)=> {
 
 
 /**
- * @api {get} /api/v1/exercise/img Request to get exercise images
+ * @api {get} /api/v1/exercise/img 운동 이미지 가져오기
  * @apiName GetExerciseImages
- * @apiGroup Exercise
+ * @apiGroup 운동
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiQuery {String} date YYYY-MM-DD or "" 
- * @apiQuery {String} resType url or buffer
- * @apiSuccess {List} exerciseImages List Image
- * @apiErrorExample {json} Something Error:
- *	HTTP/1.1 500 Internal Server Error
- *	{ 
- * 		error: "something error msg" 
- *	}
- * @apiErrorExample {json} Token Expired:
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiQuery {String} date 가져올 날짜 YYYY-MM-DD 또는 빈값(전체) 
+ * @apiQuery {String} resType 반환타입 url 또는 buffer
+ * @apiSuccess {List} exerciseImages 이미지 리스트
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+	 	code: 5
+ *		error: "Token Expired"
  * 	}
- * @apiSuccessExample {json} Success - buffer:
+ * @apiSuccessExample {json} 성공 - 반환타입 buffer:
  *	HTTP/1.1 200 OK
  *	{
-		"exerciseImages" : [
+		exerciseImages : [
 			{
-				"date" : "2021-09-16",
-				"time" : "22:01:13",
-				"img" : {
+				date: "2021-09-16",
+				time: "22:01:13",
+				img: {
 					type : "Buffer",
 					data : Buffer(ex: [123,0,1,0,0,...])
 				}
@@ -287,14 +285,14 @@ exports.uploadMyExPhoto = (req, res, next)=> {
 			...
 		]
  *	}
-	@apiSuccessExample {json} Success - url:
+	@apiSuccessExample {json} 성공 - 반환타입 url:
  *	HTTP/1.1 200 OK
  *	{
-		"exerciseImages" : [
+		exerciseImages : [
 			{
-				"date" : "2021-09-16",
-				"time" : "22:01:13",
-				"_id" : "uuid" 
+				date : "2021-09-16",
+				time : "22:01:13",
+				_id : "uuid" 
 			},
 			...
 		]
@@ -320,8 +318,12 @@ exports.getImages = (req, res, next) => {
 			exerciseImages : data
 		})
 	}
-
-	getData().then(send)
+	try {
+		getData().then(send)
+	} catch(e) {
+		throw new Error(e.message)
+	}
+	
 	
 }
 
@@ -329,23 +331,23 @@ exports.getImages = (req, res, next) => {
 
 
 /**
- * @api {patch} /api/v1/exercise/score Request to patch user's score
+ * @api {patch} /api/v1/exercise/score 사용자의 점수 업데이트
  * @apiName PatchScore
- * @apiGroup Exercise
+ * @apiGroup 운동
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiQuery {Number} score Your score 
- * @apiSuccess {Number} score your the highest score
- * @apiErrorExample {json} Something Error:
- *	HTTP/1.1 500 Error
- *	{ 
-	 	code: Number
- * 		error: "Here is some Error Message" 
- *	}
- * @apiSuccessExample {json} Success:
+ * @apiHeader {String} x-access-token 사용자의 토큰
+ * @apiQuery {Number} score 사용자의 점수
+ * @apiSuccess {Number} score 사용자의 가장 높은 점수
+ * @apiErrorExample {json} 토큰 만료:
+ *	HTTP/1.1 419
+ *	{
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  *	{
-		"score": 150
+		score: 150
  *	}
  */
 exports.patchScore = (req,res,next) => {
@@ -358,12 +360,16 @@ exports.patchScore = (req,res,next) => {
 	const send = (result) => {
 		return res.status(200).json({score: result.score})
 	}
-	if(!req.query.score) {
-		res.status(400)
-		throw new Error("1")
-	}
-	else {
-		patch(req.query.score).then(request).then(send)
+	try {
+		if(!req.query.score) {
+			res.status(400)
+			throw new Error("1")
+		}
+		else {
+			patch(req.query.score).then(request).then(send)
+		}
+	} catch(e) {
+		throw new Error(e.message)
 	}
 }
 

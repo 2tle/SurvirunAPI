@@ -29,10 +29,13 @@ exports.sendImg = (req,res) => {
 	}
 
 	const bufToImg = (data) => {
-		//console.log(data)
 		return res.header('Content-Type','image/jpeg').status(200).send(data.img)
-
 	}
-	typeToSendImg().then(bufToImg)
+	try {
+		typeToSendImg().then(bufToImg)
+	} catch (e) {
+		throw Error(e.message)
+	}
+	
 	
 } 

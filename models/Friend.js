@@ -5,9 +5,9 @@ const Schema = mongoose.Schema
 const Friend = new Schema({
 	uid: {
 	  type: String,
-	  required: true
+	  required: true,
   	},
-	friends: [String]
+	friends: [String],
 })
 
 module.exports = mongoose.model("friend",Friend)
