@@ -1,432 +1,10 @@
 define({ "api": [
   {
-    "type": "post",
-    "url": "/api/v1/auth/new",
-    "title": "Request to create new user",
-    "name": "CreateNewUser",
-    "group": "Auth",
-    "version": "1.0.0",
-    "body": [
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "username",
-        "description": "<p>user's username</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "email",
-        "description": "<p>user's email</p>"
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "password",
-        "description": "<p>user's password</p>"
-      }
-    ],
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "token",
-            "description": "<p>user's jwt token</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"token\":\"eyJwe...\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "examples": [
-        {
-          "title": "Not Found email:",
-          "content": "HTTP/1.1 400 Bad Request\n{ \n\terror: \"Data must not be null\" \n}",
-          "type": "json"
-        },
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "Auth"
-  },
-  {
-    "type": "get",
-    "url": "/api/v1/auth/jwt-decode",
-    "title": "Request to decode jwt token",
-    "name": "DecodeJwtToken",
-    "group": "Auth",
-    "version": "1.0.0",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "x-access-token",
-            "description": "<p>user's jwt token</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "_id",
-            "description": "<p>user's id</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "email",
-            "description": "<p>user's email</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>user's username</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "iat",
-            "description": "<p>time that created token</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "exp",
-            "description": "<p>time that will expire token</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "iss",
-            "description": "<p>token issur</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "sub",
-            "description": "<p>token info</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"_id\": \"613d65b91ef2af056a355438\",\n\t\"email\": \"taljosun\",\n\t\"username\": \"commonLicense\",\n\t\"iat\": 1631533262,\n\t\"exp\": 1631576462,\n\t\"iss\": \"studyRestAPI.2tle.repl.co\",\n\t\"sub\": \"userinfo\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "examples": [
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "Auth"
-  },
-  {
-    "type": "delete",
-    "url": "/api/v1/auth/local",
-    "title": "Request to delete user",
-    "name": "DeletePassword",
-    "group": "Auth",
-    "version": "1.0.0",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "x-access-token",
-            "description": "<p>user's jwt token</p>"
-          }
-        ]
-      }
-    },
-    "body": [
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "password",
-        "description": "<p>password</p>"
-      }
-    ],
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "result",
-            "description": "<p>true or false</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "examples": [
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "Auth"
-  },
-  {
-    "type": "post",
-    "url": "/api/v1/auth/local",
-    "title": "Request to login",
-    "name": "Login",
-    "group": "Auth",
-    "version": "1.0.0",
-    "body": [
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "email",
-        "description": ""
-      },
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "password",
-        "description": ""
-      }
-    ],
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "token",
-            "description": "<p>user's jwt token</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "username",
-            "description": "<p>if user set its username T/F</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "profile",
-            "description": "<p>if user set its profile img T/F</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"token\":\"eyJwe...\",\n\t\"username\" : true,\n\t\"profile\" : false\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "examples": [
-        {
-          "title": "Not Found email:",
-          "content": "HTTP/1.1 400 Bad Request\n{ \n\terror: \"Data must not be null\" \n}",
-          "type": "json"
-        },
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "Auth"
-  },
-  {
-    "type": "patch",
-    "url": "/api/v1/auth/password",
-    "title": "Request to update password",
-    "name": "UpdatePassword",
-    "group": "Auth",
-    "version": "1.0.0",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "x-access-token",
-            "description": "<p>user's jwt token</p>"
-          }
-        ]
-      }
-    },
-    "body": [
-      {
-        "group": "Body",
-        "type": "String",
-        "optional": false,
-        "field": "changePassword",
-        "description": "<p>changePassword</p>"
-      }
-    ],
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "result",
-            "description": "<p>true or false</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "examples": [
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "Auth"
-  },
-  {
-    "type": "patch",
-    "url": "/api/v1/auth/by-username/:username",
-    "title": "Request to update username",
-    "name": "UpdateUsername",
-    "group": "Auth",
-    "version": "1.0.0",
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "x-access-token",
-            "description": "<p>user's jwt token</p>"
-          }
-        ]
-      }
-    },
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>username that will update</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Boolean",
-            "optional": false,
-            "field": "result",
-            "description": "<p>true or false</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "examples": [
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
-          "type": "json"
-        }
-      ]
-    },
-    "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "Auth"
-  },
-  {
     "type": "get",
     "url": "/api/v1/auth/by-email/:email/exists",
-    "title": "Request to check who has email",
+    "title": "이메일 사용 여부",
     "name": "CheckUserWhohasEmail",
-    "group": "User",
+    "group": "사용자",
     "version": "1.0.0",
     "parameter": {
       "fields": {
@@ -436,7 +14,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "email",
-            "description": "<p>email</p>"
+            "description": "<p>이메일</p>"
           }
         ]
       }
@@ -449,32 +27,41 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "exists",
-            "description": "<p>If someone already had email, return true. If nobody had email, return false.</p>"
+            "description": "<p>결과 사용중이면 true 아니면 false</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "Nobody uses email:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"exists\": false\n}",
+          "title": "성공 - 사용가능:",
+          "content": "HTTP/1.1 200 OK\n{\n\texists: false\n}",
           "type": "json"
         },
         {
-          "title": "Someone uses email:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"exists\": true\n}",
+          "title": "성공 - 사용중:",
+          "content": "HTTP/1.1 200 OK\n{\n\texists: true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
           "type": "json"
         }
       ]
     },
     "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "User"
+    "groupTitle": "사용자"
   },
   {
     "type": "get",
     "url": "/api/v1/auth/by-username/:username/exists",
-    "title": "Request to check who has username",
+    "title": "이름 사용 여부",
     "name": "CheckUserWhohasUsername",
-    "group": "User",
+    "group": "사용자",
     "version": "1.0.0",
     "parameter": {
       "fields": {
@@ -484,7 +71,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "username",
-            "description": "<p>username</p>"
+            "description": "<p>이름</p>"
           }
         ]
       }
@@ -497,32 +84,41 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "exists",
-            "description": "<p>If someone already had username, return true. If nobody had username, return false.</p>"
+            "description": "<p>결과 사용중이면 true 아니면 false</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "Nobody uses username:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"exists\": false\n}",
+          "title": "성공 - 사용가능:",
+          "content": "HTTP/1.1 200 OK\n{\n\texists: false\n}",
           "type": "json"
         },
         {
-          "title": "Someone uses username:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"exists\": true\n}",
+          "title": "성공 - 사용중:",
+          "content": "HTTP/1.1 200 OK\n{\n\texists: true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
           "type": "json"
         }
       ]
     },
     "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "User"
+    "groupTitle": "사용자"
   },
   {
     "type": "get",
     "url": "/api/v1/auth/profile",
-    "title": "Request to get user's profile image",
+    "title": "사용자 이미지 가져오기",
     "name": "GetProfileImage",
-    "group": "User",
+    "group": "사용자",
     "version": "1.0.0",
     "header": {
       "fields": {
@@ -532,7 +128,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "x-access-token",
-            "description": "<p>user's jwt token</p>"
+            "description": "<p>사용자 토큰</p>"
           }
         ]
       }
@@ -543,28 +139,28 @@ define({ "api": [
         "type": "String",
         "optional": false,
         "field": "reqType",
-        "description": "<p>email or username or self</p>"
+        "description": "<p>요청타입 email 또는 username 또는 self</p>"
       },
       {
         "group": "Query",
         "type": "String",
         "optional": false,
         "field": "resType",
-        "description": "<p>url or buffer</p>"
+        "description": "<p>반환타입 url 또는 buffer</p>"
       },
       {
         "group": "Query",
         "type": "String",
         "optional": false,
         "field": "username",
-        "description": "<p>(Optional) if you want to other user's image, input it.</p>"
+        "description": "<p>(옵션) 다른 사용자의 이름</p>"
       },
       {
         "group": "Query",
         "type": "String",
         "optional": false,
         "field": "email",
-        "description": "<p>(Optional) if you want to other user's image, input it.</p>"
+        "description": "<p>(옵션) 다른 사용자의 이메일</p>"
       }
     ],
     "success": {
@@ -575,19 +171,19 @@ define({ "api": [
             "type": "Object",
             "optional": false,
             "field": "img",
-            "description": "<p>ImageBuffer..</p>"
+            "description": "<p>이미지버퍼</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "Success - buffer:",
-          "content": "\tHTTP/1.1 200 OK\n\t{\n\t\t\"img\" : {\n\t\t\t\t\ttype : \"Buffer\",\n\t\t\t\t\tdata : Buffer(ex: [123,0,1,0,0,...])\n\t\t\t}\n\t\t\t\n \t\t}\n\t}",
+          "title": "성공 - 반환타입 buffer:",
+          "content": "\tHTTP/1.1 200 OK\n\t{\n\t\timg : {\n\t\t\t\t\ttype : \"Buffer\",\n\t\t\t\t\tdata : Buffer(ex: [123,0,1,0,0,...])\n\t\t\t}\n\t\t\t\n \t\t}\n\t}",
           "type": "json"
         },
         {
-          "title": "Success - url:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"img\" : \"uuid\"\n}",
+          "title": "성공 - 반환타입 url:",
+          "content": "HTTP/1.1 200 OK\n{\n\timg : \"uuid\"\n}",
           "type": "json"
         }
       ]
@@ -595,26 +191,21 @@ define({ "api": [
     "error": {
       "examples": [
         {
-          "title": "Something Error:",
-          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
-          "type": "json"
-        },
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
           "type": "json"
         }
       ]
     },
     "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "User"
+    "groupTitle": "사용자"
   },
   {
     "type": "get",
     "url": "/api/v1/auth/by-email/:email",
-    "title": "Request to get user by email",
+    "title": "이메일로 사용자 정보 가져오기",
     "name": "GetUserByEmail",
-    "group": "User",
+    "group": "사용자",
     "version": "1.0.0",
     "header": {
       "fields": {
@@ -624,7 +215,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "x-access-token",
-            "description": "<p>user's jwt token</p>"
+            "description": "<p>사용자 토큰</p>"
           }
         ]
       }
@@ -637,7 +228,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "email",
-            "description": "<p>email</p>"
+            "description": "<p>이름</p>"
           }
         ]
       }
@@ -647,17 +238,45 @@ define({ "api": [
         "Success 200": [
           {
             "group": "Success 200",
-            "type": "User",
+            "type": "String",
             "optional": false,
-            "field": "user",
-            "description": "<p>UserData</p>"
+            "field": "email",
+            "description": "<p>이메일</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>이름</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "intro",
+            "description": "<p>소개글</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "score",
+            "description": "<p>점수</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "List",
+            "optional": false,
+            "field": "exerciseHistory",
+            "description": "<p>운동기록</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "Success:",
-          "content": "\tHTTP/1.1 200 OK\n\t{\n\t\t\"_id\": \"3cda3912...\",\n    \t\"email\": \"test@test.com\",\n   \t\t\"username\": \"testUsername\",\n\t\t\"intro\": \"this is my just 소개글.\",\n\t\t\"score\": 100,\n\t\t\"exerciseHistory\": [\n\t\t\t{\n\t\t\t\t\"calorie\":10\n\t\t\t\t\"km\":0.045,\n\t\t\t\t\"time\": 4312,\n\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t},\n\t\t\t...\n\t\t]\n\t}",
+          "title": "성공:",
+          "content": "\tHTTP/1.1 200 OK\n\t{\n \temail: \"test@test.com\",\n  \tusername: \"testUsername\",\n\t\tintro: \"this is my just 소개글.\",\n\t\tscore: 100,\n\t\texerciseHistory: [\n\t\t\t{\n\t\t\t\tcalorie:10\n\t\t\t\tkm:0.045,\n\t\t\t\ttime: 4312,\n\t\t\t\tdate:\"2021-09-13\"\n\t\t\t},\n\t\t\t...\n\t\t]\n\t}",
           "type": "json"
         }
       ]
@@ -665,26 +284,21 @@ define({ "api": [
     "error": {
       "examples": [
         {
-          "title": "Not Found email:",
-          "content": "HTTP/1.1 404 Not Found\n{\n\tuser: null\n}",
-          "type": "json"
-        },
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
           "type": "json"
         }
       ]
     },
     "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "User"
+    "groupTitle": "사용자"
   },
   {
     "type": "get",
     "url": "/api/v1/auth/by-username/:username",
-    "title": "Request to get user by username",
+    "title": "이름으로 사용자 정보 가져오기",
     "name": "GetUserByUsername",
-    "group": "User",
+    "group": "사용자",
     "version": "1.0.0",
     "header": {
       "fields": {
@@ -694,7 +308,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "x-access-token",
-            "description": "<p>user's jwt token</p>"
+            "description": "<p>사용자 토큰</p>"
           }
         ]
       }
@@ -707,7 +321,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "username",
-            "description": "<p>username</p>"
+            "description": "<p>이름</p>"
           }
         ]
       }
@@ -717,17 +331,45 @@ define({ "api": [
         "Success 200": [
           {
             "group": "Success 200",
-            "type": "User",
+            "type": "String",
             "optional": false,
-            "field": "user",
-            "description": "<p>UserData</p>"
+            "field": "email",
+            "description": "<p>이메일</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>이름</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "intro",
+            "description": "<p>소개글</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "score",
+            "description": "<p>점수</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "List",
+            "optional": false,
+            "field": "exerciseHistory",
+            "description": "<p>운동기록</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "Success:",
-          "content": "\tHTTP/1.1 200 OK\n\t{\n  \n    \t\"_id\": \"3cda3912...\",\n    \t\"email\": \"test@test.com\",\n    \t\"username\": \"testUsername\",\n\t\t\"intro\": \"this is my just 소개글.\",\n\t\t\"score\": 100,\n\t\t\"exerciseHistory\": [\n\t\t\t{\n\t\t\t\t\"calorie\":10\n\t\t\t\t\"km\":0.045,\n\t\t\t\t\"time\": 4312,\n\t\t\t\t\"date\":\"2021-09-13\"\n\t\t\t},\n\t\t\t...\n\t\t]\n\t}",
+          "title": "성공:",
+          "content": "\tHTTP/1.1 200 OK\n\t{\n \temail: \"test@test.com\",\n    \tusername: \"testUsername\",\n\t\tintro: \"this is my just 소개글.\",\n\t\tscore: 100,\n\t\texerciseHistory: [\n\t\t\t{\n\t\t\t\tcalorie:10\n\t\t\t\tkm:0.045,\n\t\t\t\ttime: 4312,\n\t\t\t\tdate:\"2021-09-13\"\n\t\t\t},\n\t\t\t...\n\t\t]\n\t}",
           "type": "json"
         }
       ]
@@ -735,26 +377,21 @@ define({ "api": [
     "error": {
       "examples": [
         {
-          "title": "Not Found username:",
-          "content": "HTTP/1.1 404 Not Found\n{\n\tuser: null\n}",
-          "type": "json"
-        },
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
           "type": "json"
         }
       ]
     },
     "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "User"
+    "groupTitle": "사용자"
   },
   {
     "type": "patch",
     "url": "/api/v1/auth/intro",
-    "title": "Request to patch my intro",
+    "title": "자기소개 수정",
     "name": "PatchUserIntro",
-    "group": "User",
+    "group": "사용자",
     "version": "1.0.0",
     "header": {
       "fields": {
@@ -764,7 +401,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "x-access-token",
-            "description": "<p>user's jwt token</p>"
+            "description": "<p>사용자 토큰</p>"
           }
         ]
       }
@@ -775,7 +412,7 @@ define({ "api": [
         "type": "String",
         "optional": false,
         "field": "intro",
-        "description": "<p>user's intro</p>"
+        "description": "<p>자기소개</p>"
       }
     ],
     "success": {
@@ -786,14 +423,14 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "result",
-            "description": "<p>true or false</p>"
+            "description": "<p>결과 true 또는 false</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"result\": true\n}",
+          "title": "성공:",
+          "content": "HTTP/1.1 200 OK\n{\n\tresult: true\n}",
           "type": "json"
         }
       ]
@@ -801,22 +438,21 @@ define({ "api": [
     "error": {
       "examples": [
         {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n \t\"code\": 5\n\t\"message\": \"Token Expired\"\n}",
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
           "type": "json"
         }
       ]
     },
     "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "User"
+    "groupTitle": "사용자"
   },
   {
     "type": "post",
     "url": "/api/v1/auth/defaultProfile",
-    "title": "Request to update user's profile as DEFAULT IMAGE",
+    "title": "프로필 이미지를 기본 이미지로 설정",
     "name": "SETProfileImageAsDefault",
-    "description": "<p>..</p>",
-    "group": "User",
+    "group": "사용자",
     "version": "1.0.0",
     "header": {
       "fields": {
@@ -826,7 +462,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "x-access-token",
-            "description": "<p>user's jwt token</p>"
+            "description": "<p>사용자 토큰</p>"
           }
         ]
       }
@@ -839,14 +475,14 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "result",
-            "description": "<p>true</p>"
+            "description": "<p>결과 true 또는 false</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"result\" : true\n}",
+          "title": "성공:",
+          "content": "HTTP/1.1 200 OK\n{\n\tresult: true\n}",
           "type": "json"
         }
       ]
@@ -854,27 +490,22 @@ define({ "api": [
     "error": {
       "examples": [
         {
-          "title": "Something Error:",
-          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
-          "type": "json"
-        },
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
           "type": "json"
         }
       ]
     },
     "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "User"
+    "groupTitle": "사용자"
   },
   {
     "type": "post",
     "url": "/api/v1/auth/profile",
-    "title": "Request to update user's profile",
+    "title": "프로필 이미지 업로드",
     "name": "UploadProfileImage",
-    "description": "<p>Must USE Header :: Content-Type :  multipart/form-data</p>",
-    "group": "User",
+    "description": "<p>헤더 사용 필수 Content-Type :  multipart/form-data</p>",
+    "group": "사용자",
     "version": "1.0.0",
     "body": [
       {
@@ -882,7 +513,7 @@ define({ "api": [
         "type": "File",
         "optional": false,
         "field": "image",
-        "description": "<p>Image File</p>"
+        "description": "<p>이미지 파일</p>"
       }
     ],
     "header": {
@@ -893,7 +524,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "x-access-token",
-            "description": "<p>user's jwt token</p>"
+            "description": "<p>사용자 토큰</p>"
           }
         ]
       }
@@ -906,14 +537,14 @@ define({ "api": [
             "type": "Boolean",
             "optional": false,
             "field": "result",
-            "description": "<p>true</p>"
+            "description": "<p>결과 true 또는 false</p>"
           }
         ]
       },
       "examples": [
         {
-          "title": "Success:",
-          "content": "HTTP/1.1 200 OK\n{\n\t\"result\" : true\n}",
+          "title": "성공:",
+          "content": "HTTP/1.1 200 OK\n{\n\tresult: true\n}",
           "type": "json"
         }
       ]
@@ -921,19 +552,14 @@ define({ "api": [
     "error": {
       "examples": [
         {
-          "title": "Something Error:",
-          "content": "HTTP/1.1 500 Internal Server Error\n{ \n\terror: \"something error msg\" \n}",
-          "type": "json"
-        },
-        {
-          "title": "Token Expired:",
-          "content": "HTTP/1.1 419\n{\n\t\"error\": \"Token Expired\"\n}",
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
           "type": "json"
         }
       ]
     },
     "filename": "routes/api/v1/auth/auth.controller.js",
-    "groupTitle": "User"
+    "groupTitle": "사용자"
   },
   {
     "type": "get",
@@ -1283,6 +909,140 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/api/v1/exercise/score/global",
+    "title": "점수 데이터 랭킹 가져오기",
+    "name": "GetGlobalScore",
+    "group": "운동",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>사용자의 토큰</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "List",
+            "optional": false,
+            "field": "users",
+            "description": "<p>사용자 정보 리스트</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "List",
+            "optional": false,
+            "field": "scores",
+            "description": "<p>사용자 점수 리스트</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공:",
+          "content": "HTTP/1.1 200 OK\n{\n\tusers: [\n\t\t{\"email\": \"someone@example.com\", \"username\": \"someone1\"},\n\t\t{\"email\": \"someone2@example.com\", \"username\": \"someone2\"}\n\t],\n\tscores: [200,100]\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/exercise/exercise.controller.js",
+    "groupTitle": "운동"
+  },
+  {
+    "type": "get",
+    "url": "/api/v1/exercise/score",
+    "title": "운동 점수 가져오기",
+    "name": "GetScore",
+    "group": "운동",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>사용자의 토큰</p>"
+          }
+        ]
+      }
+    },
+    "query": [
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "reqType",
+        "description": "<p>요청타입 email 또는 username</p>"
+      },
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "email",
+        "description": "<p>(옵션) 이메일 요청타입이 email인 경우</p>"
+      },
+      {
+        "group": "Query",
+        "type": "String",
+        "optional": false,
+        "field": "username",
+        "description": "<p>(옵션) 이름 요청타입이 username인 경우</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Number",
+            "optional": false,
+            "field": "score",
+            "description": "<p>사용자의 가장 높은 점수</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공:",
+          "content": "HTTP/1.1 200 OK\n{\n\tscore: 150\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/exercise/exercise.controller.js",
+    "groupTitle": "운동"
+  },
+  {
+    "type": "get",
     "url": "/api/v1/exercise",
     "title": "오늘의 운동 데이터 가져오기",
     "name": "GetTodayExercise",
@@ -1578,6 +1338,331 @@ define({ "api": [
     },
     "filename": "routes/api/v1/exercise/exercise.controller.js",
     "groupTitle": "운동"
+  },
+  {
+    "type": "post",
+    "url": "/api/v1/auth/new",
+    "title": "새 계정 생성",
+    "name": "CreateNewUser",
+    "group": "인증",
+    "version": "1.0.0",
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "username",
+        "description": "<p>생성할 이름</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "email",
+        "description": "<p>생성할 이메일</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "password",
+        "description": "<p>생성할 비밀번호</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>사용자의 토큰</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공:",
+          "content": "HTTP/1.1 200 OK\n{\n\ttoken:\"eyJwe...\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "인증"
+  },
+  {
+    "type": "delete",
+    "url": "/api/v1/auth/local",
+    "title": "사용자 삭제",
+    "name": "DeletePassword",
+    "group": "인증",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>사용자 토큰</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "password",
+        "description": "<p>사용자의 비밀번호</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>결과 true 또는 false</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공:",
+          "content": "HTTP/1.1 200 OK\n{\n\tresult: true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "인증"
+  },
+  {
+    "type": "post",
+    "url": "/api/v1/auth/local",
+    "title": "로그인",
+    "name": "Login",
+    "group": "인증",
+    "version": "1.0.0",
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "email",
+        "description": "<p>이메일</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "password",
+        "description": "<p>비밀번호</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>사용자의 토큰</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "username",
+            "description": "<p>이름 등록 여부</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "profile",
+            "description": "<p>프로필 이미지 등록 여부</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공:",
+          "content": "HTTP/1.1 200 OK\n{\n\ttoken:\"eyJwe...\",\n\tusername : true,\n\tprofile : false\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "인증"
+  },
+  {
+    "type": "patch",
+    "url": "/api/v1/auth/password",
+    "title": "비밀번호 변경",
+    "name": "UpdatePassword",
+    "group": "인증",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>사용자 토큰</p>"
+          }
+        ]
+      }
+    },
+    "body": [
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "currentPasswrod",
+        "description": "<p>현재 비밀번호</p>"
+      },
+      {
+        "group": "Body",
+        "type": "String",
+        "optional": false,
+        "field": "changePassword",
+        "description": "<p>변경할 비밀번호</p>"
+      }
+    ],
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>결과 true 또는 false</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공:",
+          "content": "HTTP/1.1 200 OK\n{\n\tresult: true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "인증"
+  },
+  {
+    "type": "patch",
+    "url": "/api/v1/auth/by-username/:username",
+    "title": "이름 업데이트",
+    "name": "UpdateUsername",
+    "group": "인증",
+    "version": "1.0.0",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "x-access-token",
+            "description": "<p>사용자 토큰</p>"
+          }
+        ]
+      }
+    },
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>업데이트할 이름</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "result",
+            "description": "<p>결과 true 또는 false</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "성공:",
+          "content": "HTTP/1.1 200 OK\n{\n\tresult: true\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "토큰 만료:",
+          "content": "HTTP/1.1 419\n{\n \tcode: 5\n\terror: \"Token Expired\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "routes/api/v1/auth/auth.controller.js",
+    "groupTitle": "인증"
   },
   {
     "type": "post",

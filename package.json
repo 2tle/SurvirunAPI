@@ -38,10 +38,10 @@
     "url": "^0.11.0"
   },
   "apidoc": {
-    "name": "2021 Digital Contest",
+    "name": "2021 디지털콘텐츠경진대회 Survirun API",
     "version": "1.0.0",
-    "description": "2021 Digital Contest  in Sunrin by Hyunjun Yang",
-    "title": "2021 Di-Con API Docs",
+    "description": "",
+    "title": "Survirun API",
     "url": "https://dicon21.2tle.io"
   }
 }

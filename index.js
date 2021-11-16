@@ -63,6 +63,8 @@ app.get('/',logMiddleware.consoleLog , (req, res) => {
 	})
 })
 
+
+
 app.use('/api', require('./routes/api'))
 
 app.use(errorMiddleware.notFound)

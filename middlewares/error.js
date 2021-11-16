@@ -9,9 +9,12 @@ const errorValue = {
 	7: "Invaild token",
 	8: "API not found",
 	9: "Goal not found",
-	10: "Intro not found"
+	10: "Intro not found",
+	11: "Score not found"
 
 }
+
+exports.errorValue = errorValue
 
 exports.notFound = (req, res) => {
 	const ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress
@@ -21,6 +24,25 @@ exports.notFound = (req, res) => {
 		code: 8,
 		message: errorValue[8]
 	})
+}
+
+exports.promiseErrHandler = (err,req,res) => {
+	const ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress
+	console.log(req.method, ip,req.originalUrl)
+	if (!res.statusCode) {
+		console.error(err.message)
+		return res.status(500).json({
+			code: 0,
+			message: err.message
+		})
+	}
+	else {
+		console.error(errorValue[err.message])
+		return res.json({
+			code: parseInt(err.message),
+			message: errorValue[err.message]
+		})
+	}
 }
 
 

@@ -30,21 +30,9 @@ exports.verifyToken = (req, res, next) => {
 		req.decoded = decoded
 		res.locals._id = decoded._id
 		next()
+	}).catch((err) => {
+		errorMiddleware.promiseErrHandler(err,req,res)
 	})
 
-
-}
-
-exports.decodeJWTToken = (req, res) => {
-	const token = req.headers['x-access-token']
-	if (!token) {
-		res.status(401)
-		throw new Error("6")
-	}
-	const dec = () => {
-		const e = jwt.decode(token, config.secret)
-		res.status(200).json(e)
-	}
-	dec()
 
 }

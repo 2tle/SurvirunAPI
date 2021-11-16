@@ -14,6 +14,10 @@ router.patch('/', logMiddleware.consoleLog, authMiddleware.verifyToken, controll
 router.get('/list', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.getExerList)
 router.post('/img', logMiddleware.consoleLog, authMiddleware.verifyToken, upload.single('image'), controller.uploadMyExPhoto)
 router.get('/img', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.getImages)
+router.get('/score',logMiddleware.consoleLog, authMiddleware.verifyToken,
+controller.getUsersScore)
 router.patch('/score', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.patchScore)
+router.get('/list/global', logMiddleware.consoleLog, authMiddleware.verifyToken,
+controller.getTopScore)
 
 module.exports = router

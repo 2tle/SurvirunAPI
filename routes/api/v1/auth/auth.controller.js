@@ -3,35 +3,42 @@ const Exercise = require('../../../../models/Exercise')
 const Friend = require('../../../../models/Friend')
 const Profile = require('../../../../models/Profile')
 const UserIntro = require('../../../../models/UserIntro')
+const ExerciseGoal = require('../../../../models/ExerciseGoal')
+const ExerciseImg = require('../../../../models/ExerciseImg')
 const CheckModule = require('../../../../module/check.js')
 const Score = require('../../../../models/Score')
+const errorMiddleware = require("../../../../middlewares/error")
 const fs = require('fs')
 const sharp = require("sharp");
 const config = require('../../../../config.js')
 const path = require('path')
 const moment = require('moment-timezone')
 const jwt = require('jsonwebtoken')
-
 const multer = require('multer')
-
 const crypto = require('crypto')
 
 /**
- * @api {get} /api/v1/auth/by-username/:username/exists Request to check who has username
+ * @api {get} /api/v1/auth/by-username/:username/exists 이름 사용 여부
  * @apiName CheckUserWhohasUsername
- * @apiGroup User
+ * @apiGroup 사용자
  * @apiVersion 1.0.0
- * @apiParam {String} username username
- * @apiSuccess {Boolean} exists If someone already had username, return true. If nobody had username, return false.
- * @apiSuccessExample {json} Nobody uses username:
+ * @apiParam {String} username 이름
+ * @apiSuccess {Boolean} exists 결과 사용중이면 true 아니면 false
+ * @apiErrorExample {json} 토큰 만료:
+ *	HTTP/1.1 419
+ *	{
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} 성공 - 사용가능:
  *	HTTP/1.1 200 OK
  *	{
- * 		"exists": false
+ * 		exists: false
  *	}
- * @apiSuccessExample {json} Someone uses username:
+ * @apiSuccessExample {json} 성공 - 사용중:
  *	HTTP/1.1 200 OK
  *	{
- *		"exists": true
+ *		exists: true
  *	}
  * 
  */
@@ -46,33 +53,45 @@ exports.usernameExists = (req, res, next) => {
 		else return res.status(200).json({ exists: true })
 	}
 
-
-	
-	const username = req.params.username
-	if (!username) { 
-		res.status(400)
-		throw new Error("1")
+	try {
+		const username = req.params.username
+		if (!username) { 
+			res.status(400)
+			throw new Error("1")
+		}
+		getUser(username).then(check).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
 	}
-	getUser(username).then(check)
+	
+	
 	
 }
 
 /**
- * @api {get} /api/v1/auth/by-email/:email/exists Request to check who has email
+ * @api {get} /api/v1/auth/by-email/:email/exists 이메일 사용 여부
  * @apiName CheckUserWhohasEmail
- * @apiGroup User
+ * @apiGroup 사용자
  * @apiVersion 1.0.0
- * @apiParam {String} email email
- * @apiSuccess {Boolean} exists If someone already had email, return true. If nobody had email, return false.
- * @apiSuccessExample {json} Nobody uses email:
- *	HTTP/1.1 200 OK
- * 	{
- *		"exists": false
- *	}
- * @apiSuccessExample {json} Someone uses email:
+ * @apiParam {String} email 이메일
+ * @apiSuccess {Boolean} exists 결과 사용중이면 true 아니면 false
+ * @apiErrorExample {json} 토큰 만료:
+ *	HTTP/1.1 419
+ *	{
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} 성공 - 사용가능:
  *	HTTP/1.1 200 OK
  *	{
- *		"exists": true
+ * 		exists: false
+ *	}
+ * @apiSuccessExample {json} 성공 - 사용중:
+ *	HTTP/1.1 200 OK
+ *	{
+ *		exists: true
  *	}
  */
 exports.emailExists = (req, res, next) => {
@@ -87,50 +106,55 @@ exports.emailExists = (req, res, next) => {
 		else return res.status(200).json({ exists: true })
 	}
 
-	
-	const email = req.params.email
-	if (!email) {
-		res.status(400)
-		throw new Error("1")
+	try {
+		const email = req.params.email
+		if (!email) {
+			res.status(400)
+			throw new Error("1")
+		}
+		getUser(email).then(check).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
 	}
-	getUser(email).then(check)
+	
+	
 	
 }
 
 
 /**
- * @api {get} /api/v1/auth/by-username/:username Request to get user by username
+ * @api {get} /api/v1/auth/by-username/:username 이름으로 사용자 정보 가져오기
  * @apiName GetUserByUsername
- * @apiGroup User
+ * @apiGroup 사용자
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiParam {String} username username
- * @apiSuccess {User} user UserData
- * @apiErrorExample {json} Not Found username:
- * 	HTTP/1.1 404 Not Found
- * 	{
- *		user: null
+ * @apiHeader {String} x-access-token 사용자 토큰
+ * @apiParam {String} username 이름
+ * @apiSuccess {String} email 이메일
+ * @apiSuccess {String} username 이름
+ * @apiSuccess {String} intro 소개글
+ * @apiSuccess {Number} score 점수
+ * @apiSuccess {List} exerciseHistory 운동기록
+ * @apiErrorExample {json} 토큰 만료:
+ *	HTTP/1.1 419
+ *	{
+	 	code: 5
+ *		error: "Token Expired"
  * 	}
- * @apiErrorExample {json} Token Expired:
- * 	HTTP/1.1 419
- * 	{
- *		"error": "Token Expired"
- * 	}
- * @apiSuccessExample {json} Success:
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  *	{
- *   
-    	"_id": "3cda3912...",
-    	"email": "test@test.com",
-    	"username": "testUsername",
-		"intro": "this is my just 소개글.",
-		"score": 100,
-		"exerciseHistory": [
+ *  	email: "test@test.com",
+    	username: "testUsername",
+		intro: "this is my just 소개글.",
+		score: 100,
+		exerciseHistory: [
 			{
-				"calorie":10
-				"km":0.045,
-				"time": 4312,
-				"date":"2021-09-13"
+				calorie:10
+				km:0.045,
+				time: 4312,
+				date:"2021-09-13"
 			},
 			...
 		]
@@ -138,12 +162,12 @@ exports.emailExists = (req, res, next) => {
  */
 exports.getUserByUsername = (req, res, next) => {
 
-	var id1 = ''
-	var email1 = ''
-	var username1 = ''
+	let id1 = ''
+	let email1 = ''
+	let username1 = ''
 	let imguid = ""
 	let intro = ""
-	var score = 0
+	let score = 0
 
 
 	const getUser = (username) => {
@@ -187,7 +211,6 @@ exports.getUserByUsername = (req, res, next) => {
 
 	const send = (d) => {
 		const userJson = {
-			"_id": id1,
 			"email": email1,
 			"username": username1,
 			"intro": intro,
@@ -197,14 +220,21 @@ exports.getUserByUsername = (req, res, next) => {
 		return res.status(200).json(userJson)
 	}
 
-
-	const username = decodeURI(req.params.username)
-
-	if (!username) {
-		res.status(400)
-		throw new Error("1")
+	try {
+		const username = decodeURI(req.params.username)
+		if (!username) {
+			res.status(400)
+			throw new Error("1")
+		}
+		getUser(username).then(check).then(dataProcess).then(dP2).then(getIntro).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
 	}
-	getUser(username).then(check).then(dataProcess).then(dP2).then(getIntro).then(send)
+	
+
+	
 	
 }
 
@@ -215,41 +245,40 @@ exports.getUserByUsername = (req, res, next) => {
 
 
 /**
- * @api {get} /api/v1/auth/by-email/:email Request to get user by email
+ * @api {get} /api/v1/auth/by-email/:email 이메일로 사용자 정보 가져오기
  * @apiName GetUserByEmail
- * @apiGroup User
+ * @apiGroup 사용자
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiParam {String} email email
- * @apiSuccess {User} user UserData
- * @apiErrorExample {json} Not Found email:
- *	HTTP/1.1 404 Not Found
- * 	{
- *		user: null
- *	}
- * @apiErrorExample {json} Token Expired:
- *  HTTP/1.1 419
- *  {
- *  	"error": "Token Expired"
- *  }
- * @apiSuccessExample {json} Success:
- *	HTTP/1.1 200 OK
- * 	{
- * 		"_id": "3cda3912...",
-    	"email": "test@test.com",
-   		"username": "testUsername",
-		"intro": "this is my just 소개글.",
-		"score": 100,
-		"exerciseHistory": [
-			{
-				"calorie":10
-				"km":0.045,
-				"time": 4312,
-				"date":"2021-09-13"
-			},
-			...
-		]
+ * @apiHeader {String} x-access-token 사용자 토큰
+ * @apiParam {String} email 이름
+ * @apiSuccess {String} email 이메일
+ * @apiSuccess {String} username 이름
+ * @apiSuccess {String} intro 소개글
+ * @apiSuccess {Number} score 점수
+ * @apiSuccess {List} exerciseHistory 운동기록
+ * @apiErrorExample {json} 토큰 만료:
+ *	HTTP/1.1 419
+ *	{
+	 	code: 5
+ *		error: "Token Expired"
  * 	}
+ * @apiSuccessExample {json} 성공:
+ *	HTTP/1.1 200 OK
+ *	{
+ *  	email: "test@test.com",
+ *   	username: "testUsername",
+ *		intro: "this is my just 소개글.",
+ *		score: 100,
+ *		exerciseHistory: [
+ *			{
+ *				calorie:10
+ *				km:0.045,
+ *				time: 4312,
+ *				date:"2021-09-13"
+ *			},
+ *			...
+ *		]
+ *	}
  */
 exports.getUserByEmail = (req, res, next) => {
 	let id1 = ''
@@ -257,7 +286,7 @@ exports.getUserByEmail = (req, res, next) => {
 	let username1 = ''
 	let imguid = ""
 	let intro = ""
-	var score= 0
+	let score= 0
 
 	const getUser = (email) => {
 		return User.find({ email: email }).exec()
@@ -301,7 +330,6 @@ exports.getUserByEmail = (req, res, next) => {
 
 	const send = (d) => {
 		const userJson = {
-			"_id": id1,
 			"email": email1,
 			"username": username1,
 			"intro": intro,
@@ -311,14 +339,20 @@ exports.getUserByEmail = (req, res, next) => {
 		return res.status(200).json(userJson)
 	}
 
-	
-	const email = decodeURI(req.params.email)
+	try {
+		const email = decodeURI(req.params.email)
 
-	if (!email) {
-		res.status(400)
-		throw new Error("1")
+		if (!email) {
+			res.status(400)
+			throw new Error("1")
+		}
+		getUser(email).then(check).then(dataProcess).then(dP2).then(getIntro).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
 	}
-	getUser(email).then(check).then(dataProcess).then(dP2).then(getIntro).then(send)
+	
 	
 	
 }
@@ -330,28 +364,24 @@ exports.getUserByEmail = (req, res, next) => {
 
 
 /**
- * @api {post} /api/v1/auth/new Request to create new user
+ * @api {post} /api/v1/auth/new 새 계정 생성
  * @apiName CreateNewUser
- * @apiGroup Auth
+ * @apiGroup 인증
  * @apiVersion 1.0.0
- * @apiBody {String} username user's username
- * @apiBody {String} email user's email
- * @apiBody {String} password user's password
- * @apiSuccess {String} token user's jwt token
- * @apiErrorExample {json} Not Found email:
- *	HTTP/1.1 400 Bad Request
- *	{ 
- *		error: "Data must not be null" 
- *	}
- * @apiSuccessExample {json} Success:
- *	HTTP/1.1 200 OK
- * 	{
- * 		"token":"eyJwe..."
- *	}
- * @apiErrorExample {json} Token Expired:
+ * @apiBody {String} username 생성할 이름
+ * @apiBody {String} email 생성할 이메일
+ * @apiBody {String} password 생성할 비밀번호
+ * @apiSuccess {String} token 사용자의 토큰
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} 성공:
+ *	HTTP/1.1 200 OK
+ * 	{
+ * 		token:"eyJwe..."
  *	}
  */
 exports.createNewUser = (req, res, next) => {
@@ -377,49 +407,52 @@ exports.createNewUser = (req, res, next) => {
 				subject: "userinfo",
 				issuer: config.hostname
 			})
-		res.status(200).json({
+		return res.status(200).json({
 			token: token
 		})
 	}
 
-	
-	const { email, username } = req.body;
-	if (email == "" || req.body.password == "") {
-		res.status(400)
-		throw new Error("1")
+	try {
+		const { email, username } = req.body;
+		if (email == "" || req.body.password == "") {
+			res.status(400)
+			throw new Error("1")
+		}
+		const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
+		createUser(email, username, password).then(createToken).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	}catch(e){
+		throw new Error(e.message)
 	}
-	const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
-	createUser(email, username, password).then(createToken)
+	
+	
 	
 
 }
 
 /**
- * @api {post} /api/v1/auth/local Request to login
+ * @api {post} /api/v1/auth/local 로그인
  * @apiName Login
- * @apiGroup Auth
+ * @apiGroup 인증
  * @apiVersion 1.0.0
- * @apiBody {String} email
- * @apiBody {String} password 
- * @apiSuccess {String} token user's jwt token
- * @apiSuccess {Boolean} username if user set its username T/F
- * @apiSuccess {Boolean} profile if user set its profile img T/F
- * @apiErrorExample {json} Not Found email:
- *	HTTP/1.1 400 Bad Request
- *	{ 
- *		error: "Data must not be null" 
- *	}
- * @apiSuccessExample {json} Success:
- *	HTTP/1.1 200 OK
- *	{
- *		"token":"eyJwe...",
- * 		"username" : true,
- * 		"profile" : false
- *	}
- * @apiErrorExample {json} Token Expired:
+ * @apiBody {String} email 이메일
+ * @apiBody {String} password 비밀번호
+ * @apiSuccess {String} token 사용자의 토큰
+ * @apiSuccess {Boolean} username 이름 등록 여부
+ * @apiSuccess {Boolean} profile 프로필 이미지 등록 여부
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+	 	code: 5
+ *		error: "Token Expired"
+ * 	}
+ * @apiSuccessExample {json} 성공:
+ *	HTTP/1.1 200 OK
+ *	{
+ *		token:"eyJwe...",
+ * 		username : true,
+ * 		profile : false
  *	}
  */
 
@@ -464,59 +497,49 @@ exports.createToken = (req, res, next) => {
 			profile: isProfileImgUploaded
 		})
 	}
-	
-	if (req.body.email == "" || req.body.password == "") {
-		res.status(400)
-		throw new Error("1")
+	try {
+		if (req.body.email == "" || req.body.password == "") {
+			res.status(400)
+			throw new Error("1")
+		}
+		const email = req.body.email;
+		const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
+		getUser(email, password).then(createToken).then(pimgc).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
 	}
-	const email = req.body.email;
-	const password = crypto.createHash('sha512').update(req.body.password).digest('base64')
-	getUser(email, password).then(createToken).then(pimgc)
+	
+	
 	
 }
 
 
 /**
- * @api {post} /api/v1/auth/profile Request to update user's profile
+ * @api {post} /api/v1/auth/profile 프로필 이미지 업로드
  * @apiName UploadProfileImage
- * @apiDescription Must USE Header :: Content-Type :  multipart/form-data
- * @apiGroup User
+ * @apiDescription 헤더 사용 필수 Content-Type :  multipart/form-data
+ * @apiGroup 사용자
  * @apiVersion 1.0.0
- * @apiBody {File} image Image File
- * @apiHeader {String} x-access-token user's jwt token
- * @apiSuccess {Boolean} result true
- * @apiErrorExample {json} Something Error:
- *	HTTP/1.1 500 Internal Server Error
- *	{ 
- * 		error: "something error msg" 
- *	}
- * @apiErrorExample {json} Token Expired:
+ * @apiBody {File} image 이미지 파일
+ * @apiHeader {String} x-access-token 사용자 토큰
+ * @apiSuccess {Boolean} result 결과 true 또는 false
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+ *	 	code: 5
+ *		error: "Token Expired"
  * 	}
- * @apiSuccessExample {json} Success:
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  *	{
-		"result" : true
+ *		result: true
  *	}
  */
 exports.uploadProfileImage = (req, res, next) => {
 
 	let imgbuffer;
-
-	const zip = () => {
-		//let t = fs.readFileSync('./defaultUserImg.png')
-		return sharp('d.PNG')
-			.withMetadata()	// 이미지의 exif데이터 유지
-			.png({
-				quality: 80,
-
-			})
-			.toBuffer().then((data) => {
-				imgbuffer = data;
-			})
-	}
 
 	const zip1 = () => {
 		return sharp(req.file.buffer)
@@ -525,11 +548,10 @@ exports.uploadProfileImage = (req, res, next) => {
 				quality: 80,
 
 			})
-			.toBuffer().then((data) => {
-				imgbuffer = data;
-			})
+			.toBuffer()
 	}
-	const findOne = () => {
+	const findOne = (as) => {
+		imgbuffer = as
 		return Profile.findOne({ uid: res.locals._id }).exec()
 	}
 
@@ -552,60 +574,54 @@ exports.uploadProfileImage = (req, res, next) => {
 	const send = (t) => {
 		return res.status(200).json({ result: true })
 	}
-	if(!req.query.reqType && req.query.reqType=="image") {
+	try {
 		if (!req.file.buffer) {
 			res.status(400)
 			throw new Error("1")
 		}
-		zip1()
-		findOne().then(uploadImg).then(send)
-	} else {
-		zip()
-		findOne().then(uploadImg).then(send)
+		
+		zip1().then(findOne).then(uploadImg).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
 	}
 }
 
 /**
- * @api {post} /api/v1/auth/defaultProfile Request to update user's profile as DEFAULT IMAGE
+ * @api {post} /api/v1/auth/defaultProfile 프로필 이미지를 기본 이미지로 설정
  * @apiName SETProfileImageAsDefault
- * @apiDescription ..
- * @apiGroup User
+ * @apiGroup 사용자
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiSuccess {Boolean} result true
- * @apiErrorExample {json} Something Error:
- *	HTTP/1.1 500 Internal Server Error
- *	{ 
- * 		error: "something error msg" 
- *	}
- * @apiErrorExample {json} Token Expired:
+ * @apiHeader {String} x-access-token 사용자 토큰
+ * @apiSuccess {Boolean} result 결과 true 또는 false
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+ *	 	code: 5
+ *		error: "Token Expired"
  * 	}
- * @apiSuccessExample {json} Success:
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  *	{
-		"result" : true
+		result: true
  *	}
  */
 exports.defaultImgSet = (req,res,next) => {
 	let imgbuffer;
 
 	const zip = () => {
-		//let t = fs.readFileSync('./defaultUserImg.png')
 		return sharp('./images/defaultUserImg.png')
 			.withMetadata()	// 이미지의 exif데이터 유지
 			.png({
 				quality: 80,
 
 			})
-			.toBuffer().then((data) => {
-				imgbuffer = data;
-			})
+			.toBuffer()
 	}
 
-	const findOne = () => {
+	const findOne = (as) => {
+		imgbuffer = as
 		return Profile.findOne({ uid: res.locals._id }).exec()
 	}
 
@@ -629,48 +645,50 @@ exports.defaultImgSet = (req,res,next) => {
 
 
 	}
-
-	zip()
-	findOne().then(uploadImg).then(send)
+	try {
+		zip().then(findOne).then(uploadImg).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
+	}
+	
 }
 
 
 
 /**
- * @api {get} /api/v1/auth/profile Request to get user's profile image
+ * @api {get} /api/v1/auth/profile 사용자 이미지 가져오기
  * @apiName GetProfileImage
- * @apiGroup User
+ * @apiGroup 사용자
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiQuery {String} reqType email or username or self
- * @apiQuery {String} resType url or buffer
- * @apiQuery {String} username (Optional) if you want to other user's image, input it.
- * @apiQuery {String} email (Optional) if you want to other user's image, input it.
- * @apiSuccess {Object} img ImageBuffer..
- * @apiErrorExample {json} Something Error:
- *	HTTP/1.1 500 Internal Server Error
- *	{ 
- * 		error: "something error msg" 
- *	}
- * @apiErrorExample {json} Token Expired:
+ * @apiHeader {String} x-access-token 사용자 토큰
+ * @apiQuery {String} reqType 요청타입 email 또는 username 또는 self
+ * @apiQuery {String} resType 반환타입 url 또는 buffer
+ * @apiQuery {String} username (옵션) 다른 사용자의 이름
+ * @apiQuery {String} email (옵션) 다른 사용자의 이메일
+ * @apiSuccess {Object} img 이미지버퍼
+ * @apiSuccess {String} img 이미지 고유값
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
+ *	 	code: 5
+ *		error: "Token Expired"
  * 	}
- * @apiSuccessExample {json} Success - buffer:
+ * @apiSuccessExample {json} 성공 - 반환타입 buffer:
  *	HTTP/1.1 200 OK
  *	{
-		"img" : {
+		img : {
 					type : "Buffer",
 					data : Buffer(ex: [123,0,1,0,0,...])
 			}
 			
  		}
  *	}
- *  @apiSuccessExample {json} Success - url:
+ *  @apiSuccessExample {json} 성공 - 반환타입 url:
  *	HTTP/1.1 200 OK
  *	{
-		"img" : "uuid"
+		img : "uuid"
  *	}
  */
 exports.getProfileImg = (req, res, next) => {
@@ -711,62 +729,39 @@ exports.getProfileImg = (req, res, next) => {
 		}
 
 	}
-
-	getData().then(getImg).then(send)
+	try {
+		getData().then(getImg).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
+	}
+	
 	
 }
 
 
-/**
- * @api {get} /api/v1/auth/jwt-decode Request to decode jwt token
- * @apiName DecodeJwtToken
- * @apiGroup Auth
- * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiSuccess {String} _id user's id
- * @apiSuccess {String} email user's email
- * @apiSuccess {String} username user's username
- * @apiSuccess {String} iat time that created token
- * @apiSuccess {String} exp time that will expire token
- * @apiSuccess {String} iss token issur
- * @apiSuccess {String} sub token info
- * @apiSuccessExample {json} Success:
- *	HTTP/1.1 200 OK
- *	{
- *		"_id": "613d65b91ef2af056a355438",
- *		"email": "taljosun",
- *		"username": "commonLicense",
- *		"iat": 1631533262,
- *		"exp": 1631576462,
- *		"iss": "studyRestAPI.2tle.repl.co",
- *		"sub": "userinfo"
- *	}
- * @apiErrorExample {json} Token Expired:
- *	HTTP/1.1 419
- *	{
- *		"error": "Token Expired"
- *	}
- */
 
 
 /**
- * @api {patch} /api/v1/auth/by-username/:username Request to update username
+ * @api {patch} /api/v1/auth/by-username/:username 이름 업데이트
  * @apiName UpdateUsername
- * @apiGroup Auth
+ * @apiGroup 인증
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiParam {String} username username that will update
- * @apiSuccess {Boolean} result true or false
- * @apiSuccessExample {json} Success:
+ * @apiHeader {String} x-access-token 사용자 토큰
+ * @apiParam {String} username 업데이트할 이름
+ * @apiSuccess {Boolean} result 결과 true 또는 false
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  * 	{
-		"result": true
+		result: true
 	}
- * @apiErrorExample {json} Token Expired:
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
- *	}
+ *	 	code: 5
+ *		error: "Token Expired"
+ * 	}
  */
 exports.updateUsername = (req, res, next) => {
 	const update = (username) => {
@@ -775,68 +770,93 @@ exports.updateUsername = (req, res, next) => {
 	const send = (t) => {
 		return res.status(200).json({ result: true })
 	}
-	
-	if (req.params.username == "") {
-		res.status(400)
-		throw new Error("1")
+	try {
+		if (req.params.username == "") {
+			res.status(400)
+			throw new Error("1")
+		}
+		update(req.params.username).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
 	}
-	update(req.params.username).then(send)
+	
 	
 }
 /**
- * @api {patch} /api/v1/auth/password Request to update password
+ * @api {patch} /api/v1/auth/password 비밀번호 변경
  * @apiName UpdatePassword
- * @apiGroup Auth
+ * @apiGroup 인증
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiBody {String} changePassword changePassword
- * @apiSuccess {Boolean} result true or false
- * @apiSuccessExample {json} Success:
+ * @apiHeader {String} x-access-token 사용자 토큰
+ * @apiBody {String} currentPasswrod 현재 비밀번호
+ * @apiBody {String} changePassword 변경할 비밀번호
+ * @apiSuccess {Boolean} result 결과 true 또는 false
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  * 	{
-		"result": true
-	}
- * @apiErrorExample {json} Token Expired:
+ *		result: true
+ *	}
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
- *	}
+ *	 	code: 5
+ *		error: "Token Expired"
+ * 	}
  */
 exports.updatePassword = (req, res, next) => {
-	const update = () => {
-		const cpassword = crypto.createHash('sha512').update(req.body.changePassword).digest('base64')
-		return User.updateOne({ _id: res.locals._id }, { password: cpassword }).exec()
+	const iCheck = (pw) => {
+		const cpw = crypto.createHash('sha512').update(pw).digest('base64')
+		return User.findOne({_id:res.locals._id, password:cpw}).exec()
+	}
+	const update = (user) => {
+		if(!user) {
+			res.status(400)
+			throw new Error("2")
+		} else {
+			const cpassword = crypto.createHash('sha512').update(req.body.changePassword).digest('base64')
+			return User.updateOne({ _id: res.locals._id }, { password: cpassword }).exec()
+		}
+		
 
 	}
 	const send = (r) => {
 		return res.status(200).json({ result: true })
 	}
-	
-	if (req.body.chagnePassword == "") {
-		res.status(400)
-		throw new Error("1")
+	try {
+		if (req.body.chagnePassword == "") {
+			res.status(400)
+			throw new Error("1")
+		}
+		iCheck(req.body.currentPassword).then(update).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
 	}
-	update().then(send)
+	
 	
 }
 /**
- * @api {delete} /api/v1/auth/local Request to delete user
+ * @api {delete} /api/v1/auth/local 사용자 삭제
  * @apiName DeletePassword
- * @apiGroup Auth
+ * @apiGroup 인증
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiBody {String} password password
- * @apiSuccess {Boolean} result true or false
- * @apiSuccessExample {json} Success:
+ * @apiHeader {String} x-access-token 사용자 토큰
+ * @apiBody {String} password 사용자의 비밀번호
+ * @apiSuccess {Boolean} result 결과 true 또는 false
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  * 	{
-		"result": true
+		result: true
 	}
- * @apiErrorExample {json} Token Expired:
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
- *		"error": "Token Expired"
- *	}
+ *	 	code: 5
+ *		error: "Token Expired"
+ * 	}
  */
 exports.deleteUser = (req, res, next) => {
 	const getUser = (pw) => {
@@ -853,7 +873,22 @@ exports.deleteUser = (req, res, next) => {
 		return Exercise.deleteMany({ uid: res.locals._id }).exec()
 	}
 	const delMyFriend = (t) => {
-		return Friend.deleteMany({ uid: res.locals._id }).exec()
+		return Friend.deleteOne({ uid: res.locals._id }).exec()
+	}
+	const delUserIntro = (t) => {
+		return UserIntro.deleteOne({uid: res.locals._id}).exec()
+	}
+	const delExerciseGoal = (t) => {
+		return ExerciseGoal.deleteOne({uid: res.locals._id}).exec()
+	}
+	const delScore = (t) => {
+		return Score.deleteOne({uid:res.locals._id}).exec()
+	}
+	const delProfile = (t) => {
+		return Profile.deleteOne({uid: res.locals._id}).exec()
+	}
+	const delExerciseImg = (t) => {
+		return ExerciseImg.deleteMany({uid: res.locals._id}).exec()
 	}
 	const delFriendOthers = (t) => {
 		return Friend.updateMany({}, {
@@ -867,35 +902,41 @@ exports.deleteUser = (req, res, next) => {
 	const send = (t) => {
 		return res.status(200).json({ result: true })
 	}
-	
-	if (req.body.password == "") {
-		res.status(400)
-		throw new Error("1")
+	try {
+		if (req.body.password == "") {
+			res.status(400)
+			throw new Error("1")
+		}
+		const pw = crypto.createHash('sha512').update(req.body.password).digest('base64')
+		getUser(pw).then(delUser).then(delExercise).then(delMyFriend).then(delUserIntro).then(delExerciseGoal).then(delScore).then(delProfile).then(delExerciseImg).then(delFriendOthers).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
 	}
-	const pw = crypto.createHash('sha512').update(req.body.password).digest('base64')
-	getUser(pw).then(delUser).then(delExercise).then(delMyFriend).then(delFriendOthers).then(send)
+	
 	
 }
 
 /**
- * @api {patch} /api/v1/auth/intro Request to patch my intro
+ * @api {patch} /api/v1/auth/intro 자기소개 수정
  * @apiName PatchUserIntro
- * @apiGroup User
+ * @apiGroup 사용자
  * @apiVersion 1.0.0
- * @apiHeader {String} x-access-token user's jwt token
- * @apiBody {String} intro user's intro
- * @apiSuccess {Boolean} result true or false
- * @apiSuccessExample {json} Success:
+ * @apiHeader {String} x-access-token 사용자 토큰
+ * @apiBody {String} intro 자기소개
+ * @apiSuccess {Boolean} result 결과 true 또는 false
+ * @apiSuccessExample {json} 성공:
  *	HTTP/1.1 200 OK
  * 	{
-		"result": true
+		result: true
 	}
- * @apiErrorExample {json} Token Expired:
+ * @apiErrorExample {json} 토큰 만료:
  *	HTTP/1.1 419
  *	{
-	 	"code": 5
- *		"message": "Token Expired"
- *	}
+ *	 	code: 5
+ *		error: "Token Expired"
+ * 	}
  */
 exports.updateUserIntro = (req,res,next) => {
 	const updateQ = (intro) => {
@@ -905,11 +946,18 @@ exports.updateUserIntro = (req,res,next) => {
 	const send = (t) => {
 		return res.status(200).json({result:true})
 	}
-	if(CheckModule.isEmpty(req.query.intro)) {
-		res.status(400)
-		throw new Error("1")
+	try {
+		if(CheckModule.isEmpty(req.query.intro)) {
+			res.status(400)
+			throw new Error("1")
+		}
+		updateQ(req.body.intro).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
+	} catch(e) {
+		throw new Error(e.message)
 	}
-	updateQ(req.body.intro).then(send)
+	
 }
 
 

@@ -3,6 +3,7 @@ const ExerciseGoal = require("../../../../models/ExerciseGoal")
 const Exercise = require('../../../../models/Exercise')
 const CheckModule = require('../../../../module/check.js')
 const config = require('../../../../config.js')
+const errorMiddleware = require("../../../../middlewares/error")
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
 const crypto = require('crypto')
@@ -61,7 +62,9 @@ exports.compareGoal = (req,res,next) => {
 	}
 
 	try {
-		getGoal(res.locals._id).then(getExerciseDT).then(sendData)
+		getGoal(res.locals._id).then(getExerciseDT).then(sendData).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
 	} catch(e) {
 		throw new Error(e.message)
 	}
@@ -101,7 +104,9 @@ exports.getMyGoal = (req,res,next) => {
 		return res.status(200).json(goal)
 	}
 	try {
-		getGoal(res.locals._id).then(sendData)
+		getGoal(res.locals._id).then(sendData).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
 	} catch(e) {
 		throw new Error(e.message)
 	}
@@ -149,7 +154,9 @@ exports.patchMyGoal = (req,res,next) => {
 		
 	} 
 	try {
-		patchGoal(res.locals._id, req.body.calorie, req.body.km, req.body.time).then(send)
+		patchGoal(res.locals._id, req.body.calorie, req.body.km, req.body.time).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
 	} catch(e) {
 		throw new Error(e.message)
 	}

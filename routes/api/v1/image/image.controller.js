@@ -1,7 +1,7 @@
 const ExerciseImg = require('../../../../models/ExerciseImg')
 const Profile = require('../../../../models/Profile')
 const CheckModule = require('../../../../module/check')
- 
+const errorMiddleware = require("../../../../middlewares/error")
 exports.sendImg = (req,res) => {
 	const typeToSendImg = () => {
 		switch(req.query.reqType) {
@@ -32,7 +32,9 @@ exports.sendImg = (req,res) => {
 		return res.header('Content-Type','image/jpeg').status(200).send(data.img)
 	}
 	try {
-		typeToSendImg().then(bufToImg)
+		typeToSendImg().then(bufToImg).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
 	} catch (e) {
 		throw Error(e.message)
 	}

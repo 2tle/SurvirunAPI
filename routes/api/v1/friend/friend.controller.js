@@ -2,6 +2,7 @@ const User = require('../../../../models/user')
 const Friend = require("../../../../models/Friend")
 const Profile = require('../../../../models/Profile')
 const CheckModule = require('../../../../module/check.js')
+const errorMiddleware = require("../../../../middlewares/error")
 const config = require('../../../../config.js')
 const jwt = require('jsonwebtoken')
 const moment = require('moment')
@@ -67,7 +68,9 @@ exports.getFriendsList = (req,res,next) => {
 		})
 	}
 	try {
-		getList().then(getUserList).then(send)
+		getList().then(getUserList).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
 	} catch(e) {
 		throw new Error(e.message)
 	}
@@ -107,12 +110,12 @@ exports.getFriendListRoom = (req,res,next) => {
 	}
 	const getProfileList = (listdata) => {
 		frList = listdata.friends
-		return Profile.find({uid: {'$in' : frList}},{_id: 1}).exec()
+		return Profile.find({uid: {'$in' : frList}},{_id: 1}).sort({uid:1}).exec()
 	}
 	const getUserList = (listdata) => {
 		proList = listdata
 
-		return User.find({_id: {'$in' : frList}},{_id:0,email:1, username:1}).exec()
+		return User.find({_id: {'$in' : frList}},{_id:0,email:1, username:1}).sort({_id:1}).exec()
 		
 	}
 
@@ -123,7 +126,9 @@ exports.getFriendListRoom = (req,res,next) => {
 		})
 	}
 	try {
-		getList().then(getProfileList).then(getUserList).then(send)
+		getList().then(getProfileList).then(getUserList).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
 	} catch(e) {
 		throw new Error(e.message)
 	}
@@ -208,7 +213,9 @@ exports.addFriend = (req,res) => {
 		return res.status(200).json({result: true})
 	}
 	try {
-		getAnotherUser().then(addMyList).then(addAnother).then(send)
+		getAnotherUser().then(addMyList).then(addAnother).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
 	} catch(e) {
 		throw new Error(e.message)
 	}
@@ -286,7 +293,9 @@ exports.removeFriend = (req,res,next) => {
 	}
 	
 	try {
-		getAnotherUser().then(removeMyList).then(removeAnother).then(send)
+		getAnotherUser().then(removeMyList).then(removeAnother).then(send).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
 	} catch(e) {
 		throw new Error(e.message)
 	}
@@ -360,7 +369,9 @@ exports.isFriend = (req,res,next) => {
 		}
 	}
 	try {
-		getAnotherUser().then(findFriend).then(isContain)
+		getAnotherUser().then(findFriend).then(isContain).catch((err) => {
+			errorMiddleware.promiseErrHandler(err,req,res)
+		})
 	} catch(e) {
 		throw new Error(e.message)
 	}

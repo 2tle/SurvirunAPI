@@ -7,8 +7,6 @@ const multer = require('multer')
 const upload = multer({storage: multer.memoryStorage(),limits: { fileSize: 10 * 1024 * 1024 }})
 
 
-
-router.get('/jwt-decode', logMiddleware.consoleLog, authMiddleware.verifyToken, authMiddleware.decodeJWTToken)
 router.get('/by-username/:username/exists', logMiddleware.consoleLog ,controller.usernameExists)
 router.get('/by-email/:email/exists', logMiddleware.consoleLog ,controller.emailExists)
 router.get('/by-username/:username', logMiddleware.consoleLog ,authMiddleware.verifyToken ,controller.getUserByUsername)
