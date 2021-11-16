@@ -3,7 +3,6 @@ const config = require('../config.js')
 const errorMiddleware = require('./error.js')
 
 exports.verifyToken = (req, res, next) => {
-
 	const token = req.headers['x-access-token']
 	if (!token) {
 		res.status(401)
@@ -33,6 +32,4 @@ exports.verifyToken = (req, res, next) => {
 	}).catch((err) => {
 		errorMiddleware.promiseErrHandler(err,req,res)
 	})
-
-
 }

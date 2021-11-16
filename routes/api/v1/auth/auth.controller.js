@@ -480,13 +480,10 @@ exports.createToken = (req, res, next) => {
 			userId = user._id;
 			isUserNameCreated = !CheckModule.isEmpty(user.username)
 			return Profile.findOne({ uid: userId })
-
 		} else {
 			res.status(404)
-			throw new Error("2")
-			
+			throw new Error("2")	
 		}
-
 	}
 
 	const pimgc = (pd) => {
