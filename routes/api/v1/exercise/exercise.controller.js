@@ -133,6 +133,17 @@ exports.updateExerciseData = (req, res, next) => {
 	
 }
 
+exports.tmpgo = (req,res,next) => {
+	calorie=[400,100,396,400,100,396,641];
+	km=[4.3,1.2,4.21,4.31,1.2,4.21,6.5];
+	time=[1900,423,1500,1800,420,1500,3600];
+	date=['19','18','17','16','15','14','13'];
+	for(var i = 0; i<7;i++) {
+		const e = new Exercise({uid:'6197a07dbcf9f900246b2d5c',date:'2021-11-'+date[i],calorie:calorie[i],km:km[i],time:time[i]});
+		e.save()
+	}
+}
+
 /**
  * @api {get} /api/v1/exercise/list 최대 1주일 까지의 운동 기록 가져오기
  * @apiName GetExerciseList

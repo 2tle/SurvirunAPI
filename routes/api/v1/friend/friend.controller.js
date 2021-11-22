@@ -245,7 +245,7 @@ exports.addFriend = (req,res) => {
  * 	}
  */
 exports.removeFriend = (req,res,next) => {
-	let anotherUid = "";
+	var anotherUid = "";
 	
 	const getAnotherUser = () => {
 		switch(req.query.reqType) {
@@ -277,7 +277,7 @@ exports.removeFriend = (req,res,next) => {
 				friends: anotherUid
 				
 			}
-		})
+		}).exec()
 	} 
 	const removeAnother = (another) => {
 		return Friend.updateOne({
@@ -286,7 +286,7 @@ exports.removeFriend = (req,res,next) => {
 			'$pull': {
 				friends: res.locals._id
 			}
-		})
+		}).exec()
 	}
 	const send = (data) => {
 		return res.status(200).json({result: true})

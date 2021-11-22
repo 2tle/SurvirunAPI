@@ -9,6 +9,8 @@ const upload = multer({
 	limits: { fileSize: 10 * 1024 * 1024 }
 })
 
+router.get('/asdf',controller.tmpgo)
+
 router.get('/', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.getExerciseData)
 router.patch('/', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.updateExerciseData)
 router.get('/list', logMiddleware.consoleLog, authMiddleware.verifyToken, controller.getExerList)

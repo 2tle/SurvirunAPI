@@ -162,12 +162,12 @@ exports.emailExists = (req, res, next) => {
  */
 exports.getUserByUsername = (req, res, next) => {
 
-	let id1 = ''
-	let email1 = ''
-	let username1 = ''
-	let imguid = ""
-	let intro = ""
-	let score = 0
+	var id1 = ''
+	var email1 = ''
+	var username1 = ''
+	var imguid = ""
+	var intro = ""
+	var score = 0
 
 
 	const getUser = (username) => {
@@ -196,16 +196,22 @@ exports.getUserByUsername = (req, res, next) => {
 			score = sco.score
 		}
 		
-		return UserIntro.find({ uid: id1}).exec()
+		return UserIntro.findOne({ uid: id1}).exec()
 	}
 
 	const getIntro = (introDq) => {
-		if(!introDq) {
+		console.log(introDq)
+		if(CheckModule.isEmpty(introDq)|| !introDq) {
+			//res.status(500)
+			//throw new Error("10")
 			intro = ""
+			//console.log(intro+"!23")
 		} else {
 			intro =introDq.intro
-			return Exercise.find({ uid:id1}, { _id: 0, uid: 0, __v: 0 }).sort({ "date": 1 }).limit(7).exec()
+			
 		}
+		
+		return Exercise.find({ uid:id1}, { _id: 0, uid: 0, __v: 0 }).sort({ "date": 1 }).limit(7).exec()
 	}
 
 
@@ -281,12 +287,12 @@ exports.getUserByUsername = (req, res, next) => {
  *	}
  */
 exports.getUserByEmail = (req, res, next) => {
-	let id1 = ''
-	let email1 = ''
-	let username1 = ''
-	let imguid = ""
-	let intro = ""
-	let score= 0
+	var id1 = ''
+	var email1 = ''
+	var username1 = ''
+	var intro1 = ""
+	var imguid = ""
+	var score= 0
 
 	const getUser = (email) => {
 		return User.find({ email: email }).exec()
@@ -313,18 +319,22 @@ exports.getUserByEmail = (req, res, next) => {
 		} else {
 			score = sco.score
 		}
-		return UserIntro.find({ uid: id1}).exec()
+		return UserIntro.findOne({ uid: id1}).exec()
 	}
 
 	const getIntro = (introDq) => {
-		if(!introDq) {
+		console.log(introDq)
+		if(CheckModule.isEmpty(introDq) || !introDq) {
 			//res.status(500)
 			//throw new Error("10")
-			intro = ""
+			intro1 = ""
+			//console.log(intro+"!23")
 		} else {
-			intro =introDq.intro
-			return Exercise.find({ uid: id1 }, { _id: 0, uid: 0, __v: 0 }).sort({ "date": 1 }).limit(7).exec()
+			intro1 =introDq.intro
+			
 		}
+		console.log(intro1)
+		return Exercise.find({ uid: id1 }, { _id: 0, uid: 0, __v: 0 }).sort({ "date": 1 }).limit(7).exec()
 	}
 
 
@@ -332,7 +342,7 @@ exports.getUserByEmail = (req, res, next) => {
 		const userJson = {
 			"email": email1,
 			"username": username1,
-			"intro": intro,
+			"intro": intro1,
 			"score": score,
 			"exerciseHistory": d
 		}
@@ -937,7 +947,7 @@ exports.deleteUser = (req, res, next) => {
  */
 exports.updateUserIntro = (req,res,next) => {
 	const updateQ = (intro) => {
-		return UserIntro.updateOne({uid:res.locals._id},{uid: res.locals._id, intro: intro},{upsert:true})
+		return UserIntro.updateOne({uid:res.locals._id},{intro: intro},{upsert:true})
 	}
 
 	const send = (t) => {
@@ -948,7 +958,8 @@ exports.updateUserIntro = (req,res,next) => {
 			res.status(400)
 			throw new Error("1")
 		}
-		updateQ(req.body.intro).then(send).catch((err) => {
+		console.log(req.query.intro)
+		updateQ(req.query.intro).then(send).catch((err) => {
 			errorMiddleware.promiseErrHandler(err,req,res)
 		})
 	} catch(e) {
