@@ -10,7 +10,8 @@ const errorValue = {
 	8: "API not found",
 	9: "Goal not found",
 	10: "Intro not found",
-	11: "Score not found"
+	11: "Score not found",
+	12: "Not JSON Data"
 
 }
 

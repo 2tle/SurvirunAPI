@@ -5,5 +5,6 @@ router.use("/exercise",require("./exercise"))
 router.use("/friend",require("./friend"))
 router.use("/image",require("./image"))
 router.use('/goal', require('./goal'))
+router.use('/game', require('./game'))
 
 module.exports = router

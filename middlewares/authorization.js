@@ -33,3 +33,17 @@ exports.verifyToken = (req, res, next) => {
 		errorMiddleware.promiseErrHandler(err,req,res)
 	})
 }
+
+exports.socketVerify = (socket, next) => {
+	const token = socket.request.headers['x-access-token']
+	if (!token) {
+		socket.disconnect(true)
+	}
+	jwt.verify(token, config.secret, (err, decoded) => {
+		if (err) {
+			next(new Error(err))
+		}
+		socket.decoded = decoded;
+		next()
+	}) 
+}
