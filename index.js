@@ -100,7 +100,7 @@ app.io.use(authMiddleware.socketVerify).on('connection',(socket) => {
 				queueData = {
 					socketID : socket.id,
 					lat: jsonData.latitude,
-					lng: jsonData.longitude,
+					lng: Math.abs(jsonData.longitude),
 					id: socket.decoded._id,
 					email: user.email,
 					username: user.username
@@ -141,6 +141,12 @@ app.io.use(authMiddleware.socketVerify).on('connection',(socket) => {
 		getUser(socket.decoded._id).then(doing)	
 	})
 
+	socket.on("queueLength",()=>{
+		socket.emit('length',JSON.stringify({
+			length: queue.length
+		}))
+	})
+
 
 	socket.on("UpdataCoordinate",function(data){
         const room_data = JSON.parse(data)
@@ -153,7 +159,7 @@ app.io.use(authMiddleware.socketVerify).on('connection',(socket) => {
         const UserCoordinate = {
             userName : userName,
             latitude: latitude,
-            longitude : longitude
+            longitude : Math.abs(longitude)
         }
         
        
@@ -173,10 +179,42 @@ app.io.use(authMiddleware.socketVerify).on('connection',(socket) => {
         }
     })
      //아이템을얻었을때
+    socket.on("addBoom",function(data){
+    	const room_data = JSON.parse(data)
+    	const roomName = room_data.roomName;
+
+    	socket.join(`${roomName}`)
+      	app.io.to(`${roomName}`).emit('addBoom')
+    })
+     socket.on("addZombie",function(data){
+    	const room_data = JSON.parse(data)
+    	const roomName = room_data.roomName;
+    	socket.join(`${roomName}`)
+    	app.io.to(`${roomName}`).emit('addZombie')
+    })
+
     socket.on("getItem",function(data){
+    	const room_data = JSON.parse(data)
+    	const roomName = room_data.roomName;
+
+        socket.join(`${roomName}`)
+    	socket.to(`${roomName}`).emit('getItem')
+
+    })
+	
+	socket.on("testGetItem",function(data){
+		console.log(data)
 		const jsonData = JSON.parse(data)
-        socket.to(`${jsonData.roomName}`).emit('getItem')   
-        app.io.to(`${jsonData.roomName}`).emit('deletebox')   
+		console.log(jsonData)
+        socket.to(`${jsonData.roomName}`).emit('getItem')
+    })
+
+
+
+     socket.on("deletebox",function(data){
+		const jsonData = JSON.parse(data)
+       
+        	app.io.to(`${jsonData.roomName}`).emit('deletebox')   
 
 
        
@@ -196,6 +234,33 @@ app.io.use(authMiddleware.socketVerify).on('connection',(socket) => {
 
     })
 
+  	socket.on("laboratory",function(data){
+        const jsonData = JSON.parse(data)
+        const lastData=room_data.lastData;
+        const scientist=room_data.scientist;
+        const roomName = room_data.roomName;
+        const UserCoordinate = {
+            lastData : lastData,
+            scientist: scientist,
+            roomName : roomName
+        }
+        
+        
+        socket.to(`${jsonData.roomName}`).emit('laboratory',JSON.stringify(UserCoordinate))
+      
+         
+        
+
+
+ 
+    })
+     
+    
+    
+
+
+
+
 	socket.on('disconnect', function(){
 	  const finder = (el) => el.socketID == socket.id
 	  const index = queue.findIndex(finder)
@@ -205,6 +270,8 @@ app.io.use(authMiddleware.socketVerify).on('connection',(socket) => {
 	  console.log(queue)
       console.log('user disconnected')
     });
+
+    
 })
 
 /* OLD CODE */
