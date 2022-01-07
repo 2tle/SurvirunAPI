@@ -1,7 +1,7 @@
 # SurvirunAPI
 
 ## ☝ Description
-This is a server that supports the REST API for the [mobile app](https://github.com/polaris428/Survirun).
+This is a server that supports the REST API for the [Survirun Android App](https://github.com/polaris428/Survirun).
 
 ## ⚡ Services
 1. Auth / User
